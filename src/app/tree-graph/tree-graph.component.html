@@ -1,0 +1,35 @@
+<div class="all">
+    <div *ngIf="showGraph" class="Info" id="container">
+
+    </div>
+    <div  id="info" class="Info">
+      <button class="btn btn-success" type="button" (click)="onBuildTree()">Bygg tree {{out}}</button>
+
+      <button class="btn btn-danger" type="button" (click)="stop()">Stop</button>
+      <ng-container
+        *ngIf="articleClicked; then articleIsClicked; else articleNotClicked">
+      </ng-container>
+
+      <ng-template #articleIsClicked>
+        <h1>Information:</h1>
+          <p>Title: {{clickedArticle.$title}}</p>
+          <p>Authors: {{clickedArticle.$authors}}</p>
+          <p>Abstract: {{clickedArticle.$paperAbstract}}</p>
+          <p>DOI: {{clickedArticle.$DOI}}</p>
+          <p>S2PaperId: {{clickedArticle.$S2PaperID}}</p>
+          <p>Read more about this paper <a href="https://api.semanticscholar.org/{{clickedArticle.$S2PaperID}}" target="_blank">here</a></p>
+      </ng-template>
+      <ng-template #articleNotClicked>
+        <h1>Please click on an article</h1>
+      </ng-template>
+
+        <br>
+        <button *ngIf="articleClicked" class="btn btn-primary" type="button" (click)="newRootNode(clickedArticle.$S2PaperID, 'in')">Set as root in-node</button>
+        <button *ngIf="articleClicked" class="btn btn-primary" type="button" (click)="newRootNode(clickedArticle.$S2PaperID, 'out')">Set as root out-node</button>
+    </div>
+
+</div>
+<div *ngIf="!showGraph ">
+  <p>New more nodes to build tree</p>
+</div>
+

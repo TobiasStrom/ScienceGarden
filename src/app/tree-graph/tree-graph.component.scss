@@ -1,0 +1,29 @@
+#container{
+    height: 94vh;
+    width: 70%;
+}
+#info{
+  background-color: rgb(235, 235, 235);
+  height: 94vh;
+  width: 30%;
+  padding: 10px;
+  overflow: scroll;
+}
+.all{
+  display: flex;
+}
+button{
+  margin: 10px;
+}
+
+@media screen and (max-width: 992px) {
+  .all{
+    display: flex;
+    flex-direction: column;
+  }
+  #info{
+    width: 100%;
+    height: auto;
+    min-height: 150px;
+  }
+}

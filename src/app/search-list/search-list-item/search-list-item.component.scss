@@ -1,0 +1,15 @@
+.card{
+  background-color: rgb(255, 255, 255);
+  min-width: 400px;
+  width: 100%;
+  margin: 5px;
+  padding: 20px;
+}
+.buttonGroup{
+  display: flex;
+  justify-content: space-between;
+}
+.buttonGroupItem{
+  width: auto;
+}
+

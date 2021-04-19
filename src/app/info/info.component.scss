@@ -1,0 +1,6 @@
+@import '/src/styles/mixin.scss';
+.info{
+  @include displayFlex(column);
+  height: 97vh;
+  text-align: center;
+}

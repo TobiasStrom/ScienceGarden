@@ -25,3 +25,18 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+
+
+## Install
+
+npm install d3@4 --save
+npm install popper.js --save
+npm install jquery
+npm install bootstrap@3
+ng add @angular/material
+npm install --save @types/d3
+npm install --save 
+npm install
+ng update
+npm update 
+

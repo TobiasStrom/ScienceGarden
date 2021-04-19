@@ -31,9 +31,15 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss"
+              "./node_modules/@angular/material/prebuilt-themes/purple-green.css",
+              "src/styles.scss",
+              "node_modules/bootstrap/scss/bootstrap.scss"
             ],
-            "scripts": []
+            "scripts": [
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/popper.js/dist/umd/popper.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.min.js"
+            ]
           },
           "configurations": {
             "production": {
@@ -94,6 +100,7 @@
               "src/assets"
             ],
             "styles": [
+              "./node_modules/@angular/material/prebuilt-themes/purple-green.css",
               "src/styles.scss"
             ],
             "scripts": []
@@ -127,5 +134,8 @@
       }
     }
   },
-  "defaultProject": "science-garden"
+  "defaultProject": "science-garden",
+  "cli": {
+    "analytics": "5cec6ac5-26a3-4929-a5bc-46550067d83b"
+  }
 }

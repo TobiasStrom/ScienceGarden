@@ -1,0 +1,51 @@
+@import '../../styles/mixin.scss', '../../styles/constants.scss';
+@media only screen and (max-width: 990px) {
+  .itemList{
+    width: 100%;
+    padding-left: 5%;
+    padding-right: 5%;
+    min-height: 97vh;
+    min-height: 97vh;
+    //background-color: red;
+  }
+}
+@media only screen and (min-width: 990px) {
+.itemList{
+  width: 100%;
+  padding-left: 20%;
+  padding-right: 20%;
+  min-height: 97vh;
+}
+}
+.navigate{
+  width: 100%;
+  display: flex;
+  text-align: center;
+  align-items: baseline;
+  justify-content: center;
+  //text-align: center;
+
+}
+.noResult{
+  height: 97vh;
+  padding-left: 20%;
+  padding: 0;
+
+}
+.pageNumber{
+  font-size: 20px;
+  padding: 10px;
+}
+.btn{
+  width: 100px;
+}
+h2{
+  padding-top: 3%;
+  padding-left: 1%;
+}
+.box{
+  @include displayFlex(column);
+  height: 97vh;
+  text-align: center;
+  width: 100%;
+ }

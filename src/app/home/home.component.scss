@@ -1,0 +1,11 @@
+@import '/src/styles/mixin.scss';
+.home{
+  @include displayFlex(column);
+  height: 97vh;
+  text-align: center;
+  width: 100%;
+}
+.search{
+  @include displayFlex(row);
+}
+
