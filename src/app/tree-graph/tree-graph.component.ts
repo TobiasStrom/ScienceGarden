@@ -334,9 +334,9 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
       //done = true;
     })
   }
-  ngOnDestroy(){
+
+  ngOnDestroy() {
     console.log('Den skal nå stoppes')
-    this.searchService.stopped = true;
     this.resetVariables();
   }
   pressed: boolean = false;
@@ -376,29 +376,36 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
   stop() {
     this.searchService.stopped = true
   }
-  newRootNode(paperId: string, type: string){
-    this.router.navigate(['tree'], {
-      skipLocationChange: false,
-      queryParams: {
-        paperId: paperId,
-        state: type,
-      }
-    } );
-    //window.location.reload();
 
+
+  /*
+   *  Function that redraws a graph for a selected node
+   *  Required variables below
+  */
+  buttonInDisable = false;
+  buttonOutDisable = false
+ 
+  onRedraw(state: string) {
+    //cleanup
+    console.log('Den skal nå stoppes');
+    let newRootArticle = this.clickedArticle;
     this.resetVariables();
-    this.searchService.buildTree(paperId, type)
-    //this.onBuildTree();
+    if (state != "in") {
+      this.in = false;
+    }
+
+    this.searchService.buildTree(state, newRootArticle.$S2PaperID);
   }
 
-  resetVariables(){
+
+  resetVariables() {
+    this.searchService.stopped = true;
     this.searchService.count = 0;
     this.searchService.countTotal = 0;
     this.searchService.superTotalCount = 1;
     this.searchService.root = this.clickedArticle;
     this.articleClicked = false;
     this.clickedArticle = null;
-    this.searchService.stopped = false;
     this.searchService.queue = [];
     this.searchService.child = null;
   }

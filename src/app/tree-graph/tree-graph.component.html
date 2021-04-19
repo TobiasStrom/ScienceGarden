@@ -24,8 +24,8 @@
       </ng-template>
 
         <br>
-        <button *ngIf="articleClicked" class="btn btn-primary" type="button" (click)="newRootNode(clickedArticle.$S2PaperID, 'in')">Set as root in-node</button>
-        <button *ngIf="articleClicked" class="btn btn-primary" type="button" (click)="newRootNode(clickedArticle.$S2PaperID, 'out')">Set as root out-node</button>
+        <button *ngIf="articleClicked" class="btn btn-primary" type="button" (click)="onRedraw('in')">Set as root in-node</button>
+        <button *ngIf="articleClicked" class="btn btn-primary" type="button" (click)="onRedraw('out')">Set as root out-node</button>
     </div>
 
 </div>
