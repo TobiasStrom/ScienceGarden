@@ -66,7 +66,7 @@ export class SearchService{
       );
   }
 
-  fetchNodes(input : string, method: string, state : string) {
+  fetchNodes(input: string, method: string, state: string) {
     var url : string = "";
     let searchParams = new HttpParams();
 
@@ -268,8 +268,7 @@ export class SearchService{
 
             }
           }else{
-            console.log("STOOOOOPPPPP")
-
+            console.log("STOOOOOPPPPP");
           }
         });
 
