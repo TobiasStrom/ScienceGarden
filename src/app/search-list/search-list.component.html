@@ -5,9 +5,9 @@
     [article]="article"
   ></app-search-list-item>
   <div class="navigate" *ngIf="list.length == 10">
-    <button [disabled]="page>1 ? false: true" class="btn btn-primary" (click)="nextPage(false)">Previous</button>
+    <button [disabled]="page>1 ? false: true" class="btn button-color" (click)="nextPage(false)">Previous</button>
     <p class="pageNumber">Page: {{page}}</p>
-    <button class="btn btn-primary" (click)="nextPage(true)">Next</button>
+    <button class="btn button-color" (click)="nextPage(true)">Next</button>
 
   </div>
 </div>
@@ -20,7 +20,6 @@
 </div>
 <div  *ngIf="list.length == 0">
   <div class="box">
-
     <h2>Searching for articles</h2>
     <h3>This can take up to 3 minutes</h3>
     <h4>If searching for one specific article</h4>

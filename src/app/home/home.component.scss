@@ -1,9 +1,10 @@
-@import '/src/styles/mixin.scss';
+@import '/src/styles/mixin.scss', '/src/styles/constants.scss';
 .home{
   @include displayFlex(column);
   height: 97vh;
   text-align: center;
   width: 100%;
+  background-color: $bodyColor;
 }
 .search{
   @include displayFlex(row);

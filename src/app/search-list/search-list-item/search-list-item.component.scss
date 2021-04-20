@@ -1,3 +1,8 @@
+@import '/src/styles/mixin.scss', '/src/styles/constants.scss';
+.button-color{
+  color: $buttonTextColor;
+  background-color : $buttonColor;
+}
 .card{
   background-color: rgb(255, 255, 255);
   min-width: 400px;
@@ -12,4 +17,9 @@
 .buttonGroupItem{
   width: auto;
 }
+.button-color:hover{
+  color: black;
+  background-color : $buttonHoverColor;
+}
+
 

@@ -8,13 +8,23 @@
     min-height: 97vh;
     //background-color: red;
   }
+  .button-color{
+    color: $buttonTextColor;
+    background-color : $buttonColor;
+  }
+
 }
+
 @media only screen and (min-width: 990px) {
 .itemList{
   width: 100%;
   padding-left: 20%;
   padding-right: 20%;
   min-height: 97vh;
+}
+.button-color{
+  color: $buttonTextColor;
+  background-color : $buttonColor;
 }
 }
 .navigate{
@@ -49,3 +59,11 @@ h2{
   text-align: center;
   width: 100%;
  }
+ .button-color{
+  color: $buttonTextColor;
+  background-color : $buttonColor;
+}
+.button-color:hover{
+  color: black;
+  background-color : $buttonHoverColor;
+}

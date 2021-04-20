@@ -2,14 +2,16 @@
   <form (ngSubmit)="onBuildTree($event)" class="form-inline my-2 my-lg-0">
     <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" #searchInput>
     <div class="btn-group" appDropdown>
-      <button (click)="onBuildTree($event)" type="submit" class="btn btn-primary">{{buttonName}}</button>
-      <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <button (click)="onBuildTree($event)" type="submit" class="btn button-color">{{buttonName}}</button>
+      <button type="button" class="btn button-color dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <span class="sr-only">Toggle Dropdown</span>
       </button>
-      <div class="dropdown-menu">
-        <a class="dropdown-item" *ngIf="buttonType != 'title'" (click)="changeModus('title')">Title</a>
-        <a class="dropdown-item" *ngIf="buttonType != 'id'"  (click)="changeModus('id')">PaperID</a>
-        <a class="dropdown-item" *ngIf="buttonType != 'doi'" (click)="changeModus('doi')">DOI</a>
+      <div>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" *ngIf="buttonType != 'title'" (click)="changeModus('title')">Title</a>
+          <a class="dropdown-item" *ngIf="buttonType != 'id'"  (click)="changeModus('id')">PaperID</a>
+          <a class="dropdown-item" *ngIf="buttonType != 'doi'" (click)="changeModus('doi')">DOI</a>
+        </div>
       </div>
     </div>
   </form>

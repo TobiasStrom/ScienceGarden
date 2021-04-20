@@ -47,5 +47,4 @@ export class SearchFieldComponent implements OnInit {
     window.scroll(0,0);
     //console.log(this.searchInputRef.nativeElement.value);
   }
-
 }

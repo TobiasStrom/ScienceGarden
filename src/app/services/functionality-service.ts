@@ -12,7 +12,7 @@ export class FunctionalityService {
 
   public click = (d) => {
     //console.log(d.children.length);
-    //console.log(d);
+    console.log(d);
 
     //this.searchService.selectedArticle = d;
 

@@ -16,6 +16,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCardModule } from '@angular/material/card';
 import { NavbarComponent } from './navbar/navbar.component';
+import { SettingsComponent } from './settings/settings.component';
+
 
 
 @NgModule({
@@ -30,6 +32,7 @@ import { NavbarComponent } from './navbar/navbar.component';
     SearchListItemComponent,
     TreeGraphComponent,
     NavbarComponent,
+    SettingsComponent,
 
   ],
   imports: [
@@ -39,7 +42,8 @@ import { NavbarComponent } from './navbar/navbar.component';
     FormsModule,
     HttpClientModule,
     BrowserAnimationsModule,
-    MatCardModule
+    MatCardModule,
+
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,19 +1,39 @@
+@import '/src/styles/mixin.scss', '/src/styles/constants.scss';
 #container{
     height: 94vh;
     width: 70%;
+    z-index: 0;
 }
 #info{
-  background-color: rgb(235, 235, 235);
+  background-color: rgb(247, 247, 247);
   height: 94vh;
   width: 30%;
   padding: 10px;
-  overflow: scroll;
+  overflow-y: scroll;
+  z-index: 2;
+
 }
 .all{
   display: flex;
 }
 button{
   margin: 10px;
+}
+.button-color{
+  color: $buttonTextColor;
+  background-color : $buttonColor;
+}
+
+.btn {
+  background-color: $buttonColor;
+  color: $buttonTextColor;
+}
+
+.dot{
+  width: 50px;
+  height: 50px;
+  background-color: red;
+  border-radius: 50%;
 }
 
 @media screen and (max-width: 992px) {
@@ -26,4 +46,14 @@ button{
     height: auto;
     min-height: 150px;
   }
+  .dot{
+    width: 50px;
+    height: 50px;
+    color: red;
+    border-radius: 50%;
+  }
+}
+.button-color:hover{
+  color: $buttonTextColor;
+  background-color : $buttonHoverColor;
 }

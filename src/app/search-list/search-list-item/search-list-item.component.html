@@ -5,17 +5,17 @@
     <p>PaperID: {{article.$S2PaperID}}</p>
     <p *ngIf="article.$paperAbstract!=null && moreInfo;">PaperAbstract: {{article.$paperAbstract}} </p>
     <p *ngIf="article.$DOI!='' || article.$DOI != null">DOI: {{article.$DOI}} </p>
-    <p *ngIf="moreInfo">In citations: {{article.$inCitations}} </p>
-    <p *ngIf="moreInfo">Out citations: {{article.$outCitations}} </p>
-    <p *ngIf="noMoreInfo">This article do not exist in semantics API</p>
-    <p *ngIf="buttonInDisable || buttonOutDisable">Article does not have any in- or out-citations</p>
+    <p *ngIf="moreInfo">In-citations: {{article.$inCitations}} </p>
+    <p *ngIf="moreInfo">Out-citations: {{article.$outCitations}} </p>
+    <p *ngIf="noMoreInfo">This article does not exist in the Semantic Scholar Archive</p>
+    <!-- <p *ngIf="buttonInDisable || buttonOutDisable">Article does not have any in- or out-citations</p> -->
     <div class="buttonGroup">
       <div class="btn-group buttonGroupIten" role="group">
-        <button [disabled]="noMoreInfo || buttonInDisable" type="button"  class="btn btn-primary" (click)="onNavigate(article.$S2PaperID,'in')">In</button>
-        <button [disabled]="noMoreInfo || buttonOutDisable" type="button" class="btn btn-primary" (click)="onNavigate(article.$S2PaperID,'out')">Out</button>
+        <button [disabled]="noMoreInfo || buttonInDisable" type="button"  class="btn button-color" (click)="onNavigate(article.$S2PaperID,'in')">In-citation Graph</button>
+        <button [disabled]="noMoreInfo || buttonOutDisable" type="button" class="btn button-color" (click)="onNavigate(article.$S2PaperID,'out')">Out-citation Graph</button>
       </div>
       <div class="buttonGroupItem">
-        <button class="btn btn-primary" (click)="onMoreInfo(article.$S2PaperID,'in')">More info</button>
+        <button class="btn button-color" (click)="onMoreInfo(article.$S2PaperID,'in')">More info</button>
       </div>
     </div>
   </mat-card-content>
