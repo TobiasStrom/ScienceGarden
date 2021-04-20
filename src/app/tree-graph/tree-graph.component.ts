@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import * as d3 from 'd3';
 import { FunctionalityService } from '../services/functionality-service';
 import { SearchService } from '../services/search.service';
@@ -32,18 +32,30 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
   clickedArticle : Article;
   articleClicked : boolean;
   firstLoad : boolean = true;
+  stopValue : boolean= false;
+  countTotalLoaded : number = 0;
+  countTotalUnloaded : number = 0;
+  countTotalLoadedOnScreen: number = 0;
+  countTotalUnloadedOnScreen: number = 0;
 
-
-
-
+  countLoadedSinceLast: number = 0;
+  done: boolean = false;
 
   constructor(
     private functionalityService: FunctionalityService,
     private searchService: SearchService,
     private route : ActivatedRoute,
-    private router : Router
+    private router : Router,
+
   ) {
     this.getScreenSize();
+    setInterval(()=> {
+      this.countTotalLoaded = this.searchService.countTotal;
+      this.countTotalUnloaded = this.searchService.superTotalCount;
+      this.countLoadedSinceLast = this.countTotalLoaded - this.countTotalLoadedOnScreen;
+      this.done = this.searchService.done;
+    }, 1 * 1000);
+
   }
   //selectedArticle : Article = this.searchService.selectedArticle;
 
@@ -53,14 +65,14 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
           this.screenWidth = window.innerWidth;
 
     }
-  out: number = this.searchService.countTotal;
 
   onBuildTree() {
-
+    this.countTotalLoadedOnScreen = this.countTotalLoaded;
+    this.countTotalUnloadedOnScreen = this.countTotalUnloaded;
     console.log(this.searchService.root);
+    this.countTotalUnloaded = this.searchService.countTotal;
     var obj = d3.hierarchy(this.searchService.root);
     var count = obj.count();
-    console.log("Number of leaves: ", count.value)
     if (this.pressed && count.value > 0) {
       d3.select("svg").remove();
       var obj = d3.hierarchy(this.searchService.root);
@@ -288,7 +300,7 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
       let transform = d3.zoomIdentity.translate(translateX, translateY).scale(scale);
       if(this.firstLoad){
         if(this.screenWidth > 992){
-          this.screenWidth = this.screenWidth * 0.7;
+          this.screenWidth = this.screenWidth* 0.693
         }
         else{
           this.screenWidth = this.screenWidth* 0.95
@@ -303,7 +315,7 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
         .select('#container')
         .append('svg')
         .attr('width', this.screenWidth)//width + margin.right + margin.left)
-        .attr('height', height + margin.top + margin.bottom)
+        .attr('height', this.screenHeight * 0.94) //height + margin.top + margin.bottom)
         .call(d3.zoom().transform, transform)
         .call(zoom)
         .append('g')
@@ -323,7 +335,7 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnInit() {
+   ngOnInit() {
     this.articleClicked = false;
     window.scroll(0,0);
     this.getScreenSize();
@@ -332,14 +344,23 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
       var type = params['state'];
       this.paperId = params['paperId'];
       //done = true;
-    })
+    });
+
   }
+
+
 
   ngOnDestroy() {
     console.log('Den skal nå stoppes')
     this.resetVariables();
   }
   pressed: boolean = false;
+
+
+  getTotalNodes(){
+
+
+  }
 
 
   onFetchArticle() {
@@ -375,6 +396,7 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
 
   stop() {
     this.searchService.stopped = true
+    this.stopValue = true;
   }
 
 
@@ -384,23 +406,29 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
   */
   buttonInDisable = false;
   buttonOutDisable = false
- 
+
   onRedraw(state: string) {
     //cleanup
     console.log('Den skal nå stoppes');
+    stop();
+
     let newRootArticle = this.clickedArticle;
     this.resetVariables();
-    if (state != "in") {
-      this.in = false;
-    }
-
+    state != "in" ? this.in = false : this.in = true;
+    //this.router.navigate(['/search'], { queryParams : { 'type': state, 'search': newRootArticle.$S2PaperID }});
+    this.router.navigate(['tree'], {
+      queryParams: {
+        paperId: newRootArticle.$S2PaperID,
+        state: state,
+      },
+    } );
     this.searchService.buildTree(state, newRootArticle.$S2PaperID);
   }
 
 
   resetVariables() {
+    console.log('Reset');
     this.searchService.stopped = true;
-    this.searchService.count = 0;
     this.searchService.countTotal = 0;
     this.searchService.superTotalCount = 1;
     this.searchService.root = this.clickedArticle;
@@ -408,7 +436,13 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
     this.clickedArticle = null;
     this.searchService.queue = [];
     this.searchService.child = null;
+    this.stopValue = false;
+    this.countTotalLoadedOnScreen = 0;
+    this.countTotalLoaded = 0;
+    this.countTotalUnloaded = 0;
+    this.countLoadedSinceLast = 0;
   }
+
 }
 
 //se om man kan sortere nodene etter år

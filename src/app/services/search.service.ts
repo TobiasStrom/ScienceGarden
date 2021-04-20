@@ -13,7 +13,9 @@ import { Article } from 'src/app/models/article.model';
 
 @Injectable({ providedIn: 'root' })
 export class SearchService{
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    ) {}
   startUrl : string = "http://dettefunker.no/api/article";
 
   maxTotalNodes = 10000;
@@ -70,7 +72,7 @@ export class SearchService{
     var url : string = "";
     let searchParams = new HttpParams();
 
-    searchParams = searchParams.append('state', state);
+    searchParams = searchParams.append('state', 'root');
 
     if(method == "doi"){
       url = this.startUrl+"/DOI/"+input;
@@ -184,16 +186,17 @@ export class SearchService{
   current : Article;
   title : string;
   value: boolean = false;
-  count: number = 0;
   stopped : boolean = false;
   //nodes : Article;
-
+  done: boolean = false;
+  maxNodesPerNode : number = 1000;
+  maxTotalNodesTree : number = 5000;
 
   queue : Article[] = [];
 
 
   async delay(ms: number) {
-    await new Promise<void>(resolve => setTimeout(()=>resolve(), ms)).then();
+    await new Promise<void>(resolve => setTimeout(()=>resolve(), ms));
   }
 
 
@@ -201,7 +204,7 @@ export class SearchService{
     this.value = false;
     this.current = null;
     this.stopped = false;
-    this.count = 0;
+
 
     const sub = this.fetchNodes(rootId, 'S2PaperId', type).subscribe(node => {
 
@@ -226,18 +229,22 @@ export class SearchService{
   superTotalCount: number = 1;
 
   async BFSTreeBuilder(type: string, node: Article){
+    console.log("Inside tree builder");
     let BFSQueue : Article[] =[];
     BFSQueue.push(node);
     let limitReached = false;
+    this.nodes = [];
+    this.done = false;
 
     while (BFSQueue.length > 0 && !this.stopped){
       if(limitReached) break;
       let currentNode : Article = BFSQueue.shift();
       this.queue.push(currentNode);
       if(this.nodes.includes(currentNode.$S2PaperID)){
+        console.log("- Node exists");
         currentNode.$children = [];
         currentNode.$type = "exist";
-        //console.log('Exists'+ currentNode.$S2PaperID);
+        console.log('Exists'+ currentNode.$S2PaperID);
       }else{
         this.nodes.push(currentNode.$S2PaperID);
       }
@@ -245,6 +252,7 @@ export class SearchService{
 
       currentNode = this.setColor(currentNode, type);
       for(let i=0; i < currentNode.$children.length; i++){
+        if (this.stopped) break;
         this.value = false;
         const sub = this.fetchNodes(currentNode.$children[i].$S2PaperID, 'S2PaperId', type).subscribe(post => {
 
@@ -262,13 +270,16 @@ export class SearchService{
               BFSQueue.push(post);
               this.value = true;
               this.countTotal++;
+
               if(this.countTotal % 10 == 0){
                 console.log(this.countTotal);
+
               }
 
             }
           }else{
             console.log("STOOOOOPPPPP");
+            this.done = true;
           }
         });
 
@@ -279,11 +290,13 @@ export class SearchService{
 
         if (limitReached){
           console.log(this.root);
+          this.done = true;
           break;
         }
       }
     }
-    console.log('Done');
+    console.log('NO MORE NODES');
+    this.done = true;
   }
   nodes : string[] = [];
   setColor(node: Article, type : String){
