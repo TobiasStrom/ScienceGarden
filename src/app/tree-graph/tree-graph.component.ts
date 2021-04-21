@@ -382,8 +382,6 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
    *  Function that redraws a graph for a selected node
    *  Required variables below
   */
-  buttonInDisable = false;
-  buttonOutDisable = false
  
   onRedraw(state: string) {
     //cleanup
@@ -410,6 +408,3 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
     this.searchService.child = null;
   }
 }
-
-//se om man kan sortere nodene etter år
-//Trym vil helst ikke ha animasjon DONE
