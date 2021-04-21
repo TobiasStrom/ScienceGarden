@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { CookieService } from 'ngx-cookie-service'
 import {
   HttpClient,
   HttpHeaders,
@@ -8,17 +9,22 @@ import {
 import { map, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Article } from 'src/app/models/article.model';
-
+//import { Settings } from '../settings/settings.component'
 
 
 @Injectable({ providedIn: 'root' })
 export class SearchService{
+  maxNodesPerNode : number = 1000;
+  maxTotalNodes : number = 10000;
+
   constructor(
     private http: HttpClient,
-    ) {}
+    private cookieService : CookieService
+    ) {
+      this.updateMaxValues();
+    }
   startUrl : string = "http://dettefunker.no/api/article";
 
-  maxTotalNodes = 10000;
 
    fetchPosts(title : string, method : string, page : number) {
     var url : string = "";
@@ -92,6 +98,8 @@ export class SearchService{
       )
       .pipe(
         map(responseData => {
+
+
           var paperAbstract : string = String(responseData["PaperAbstract"]);
           var authors : string[] = [];
           for(let id in responseData["Authors"]){
@@ -102,9 +110,10 @@ export class SearchService{
           var inCount: number = 0;
           var outCount : number = 0;
           if(state == 'in'){
-            for(let id in responseData['InCitations']){
-              if(this.superTotalCount <= this.maxTotalNodes){
-                var inArticle = new Article(responseData['InCitations'][id], null, null, null,null,null , null, null, null, "#3A5F0B", null);
+
+            for(let i = 0; i < Object.keys(responseData["InCitations"]).length && i < this.maxNodesPerNode; i++){
+              if(this.superTotalCount <= this.maxTotalNodes - 1){
+                var inArticle = new Article(responseData['InCitations'][i], null, null, null,null,null , null, null, null, "#3A5F0B", null);
                 children.push(inArticle);
                 this.superTotalCount++;
                 inCount++;
@@ -116,9 +125,10 @@ export class SearchService{
 
           }
           else{
-            for(let id in responseData["OutCitations"]){
-              if(this.superTotalCount <= this.maxTotalNodes){
-                var outArticle = new Article(responseData['OutCitations'][id], null, null, null,null,null , null, null, null, "#D2B48C", null);
+            for (let i = 0; i < Object.keys(responseData["OutCitations"]).length && i < this.maxNodesPerNode; i++) {
+            //for(let id in responseData["OutCitations"]){
+              if(this.superTotalCount <= this.maxTotalNodes - 1){
+                var outArticle = new Article(responseData['OutCitations'][i], null, null, null,null,null , null, null, null, "#D2B48C", null);
                 children.push(outArticle);
                 outCount++;
                 this.superTotalCount++;
@@ -189,8 +199,8 @@ export class SearchService{
   stopped : boolean = false;
   //nodes : Article;
   done: boolean = false;
-  maxNodesPerNode : number = 1000;
-  maxTotalNodesTree : number = 5000;
+
+
 
   queue : Article[] = [];
 
@@ -230,6 +240,13 @@ export class SearchService{
 
   async BFSTreeBuilder(type: string, node: Article){
     console.log("Inside tree builder");
+    console.log("Getting Max Values");
+    this.updateMaxValues();
+    console.log(
+      "Following Max Values received: \n" +
+      "MaxNodesPerNode: " + this.maxNodesPerNode +
+      "\n MaxTotalNodes: " + this.maxTotalNodes
+    );
     let BFSQueue : Article[] =[];
     BFSQueue.push(node);
     let limitReached = false;
@@ -252,13 +269,14 @@ export class SearchService{
 
       currentNode = this.setColor(currentNode, type);
       for(let i=0; i < currentNode.$children.length; i++){
+        if(i >= this.maxNodesPerNode) break;
         if (this.stopped) break;
         this.value = false;
         const sub = this.fetchNodes(currentNode.$children[i].$S2PaperID, 'S2PaperId', type).subscribe(post => {
 
           if(!this.stopped)
           {
-            if (this.countTotal >= this.maxTotalNodes + 1){
+            if (this.countTotal >= this.maxTotalNodes){
               limitReached = true;
               this.value = true;
             }else{
@@ -351,5 +369,19 @@ export class SearchService{
     }
     */
     return node;
+  }
+
+
+  updateMaxValues(){
+    let maxNodesPerNode = Number(this.cookieService.get("MaxNodesPerNode"));
+    let maxTotalNodes = Number(this.cookieService.get("MaxTotalNodes"));
+
+    if(!isNaN(maxNodesPerNode) && !isNaN(maxTotalNodes) && maxNodesPerNode > 0 && maxTotalNodes > 0){
+      this.maxTotalNodes = maxTotalNodes;
+      this.maxNodesPerNode = maxNodesPerNode;
+    } else{
+      this.maxTotalNodes = 10000;
+      this.maxNodesPerNode = 10000;
+    }
   }
 }
