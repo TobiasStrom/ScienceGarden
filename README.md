@@ -49,3 +49,5 @@ npm install --save @ng-bootstrap/ng-bootstrap
 
 npm install --save bootstrap@4
 
+npm install ngx-cookie-service
+
