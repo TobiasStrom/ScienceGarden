@@ -24,6 +24,8 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
   map: any;
   screenHeight: number;
   screenWidth: number;
+  graphWidth : number;
+  graphHeight : number;
   totalNodeCount: number;
   widthScreen : number;
   in : boolean = true;
@@ -136,16 +138,6 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
               d.y = max * 0.95 + ( (d.depth - 4 ) * (max*0.10));
             }
           }
-          /*
-          if(d.depth == 0){
-            d.y = d.depth * -500;
-          }
-          else if(){
-
-          }else{
-            d.y = (d.depth * -100) - 900;
-          }
-          */
 
         });
 
@@ -166,6 +158,7 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
             this.clickedArticle = this.functionalityService.click(d).data;
             draw(this.clickedArticle);
             this.articleClicked = true;
+            this.updateColorDescription();
           });
 
         nodeEnter
@@ -298,15 +291,17 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
 
 
       let transform = d3.zoomIdentity.translate(translateX, translateY).scale(scale);
-      if(this.firstLoad){
-        if(this.screenWidth > 992){
-          this.screenWidth = this.screenWidth* 0.693
-        }
-        else{
-          this.screenWidth = this.screenWidth* 0.95
-        }
 
-        this.firstLoad = false;
+      this.graphWidth = this.screenWidth;
+
+      if(this.screenWidth > 992){
+        this.graphWidth = this.graphWidth * 0.693
+      }
+      else{
+        this.graphWidth = this.graphWidth * 0.95
+
+
+      //this.firstLoad = false;
       }
       let zoom = d3.zoom().on('zoom', function () {
         svg.attr('transform', d3.event.transform);
@@ -314,7 +309,7 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
       let svg = d3
         .select('#container')
         .append('svg')
-        .attr('width', this.screenWidth)//width + margin.right + margin.left)
+        .attr('width', this.graphWidth)//width + margin.right + margin.left)
         .attr('height', this.screenHeight * 0.94) //height + margin.top + margin.bottom)
         .call(d3.zoom().transform, transform)
         .call(zoom)
@@ -328,8 +323,9 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
       let root;
       root = this.searchService.root;
       root = d3.hierarchy(root);
-      root.x0 = this.screenWidth/ 2;
+      root.x0 = this.graphWidth/ 2;
       root.y0 = 0;
+
       draw(root);
       console.log('done building');
     }
@@ -443,6 +439,34 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
     this.countLoadedSinceLast = 0;
   }
 
+  clickedArticleColorDescription : string = "";
+  updateColorDescription(){
+    let type = this.clickedArticle.$type;
+    if(type == "normal"){
+      this.clickedArticleColorDescription = "This article is not open access or publisher licensed";
+    }
+    if(this.clickedArticle.$isOpenAccess){
+      this.clickedArticleColorDescription = "This article is open access";
+    }
+    if (this.clickedArticle.$isPublisherLicensed){
+      this.clickedArticleColorDescription = "This article is publisher licensed";
+    }
+    if(this.clickedArticle.$isPublisherLicensed && this.clickedArticle.$isOpenAccess){
+      this.clickedArticleColorDescription = "This article is publisher licensed and open access.";
+    }
+    if(type == "retracted"){
+      this.clickedArticleColorDescription = "This article has been retracted";
+    }
+    if(type == "exist"){
+      this.clickedArticleColorDescription = "This article has duplicates that are present in the graph"
+    }
+    if(type == "root"){
+      this.clickedArticleColorDescription = "This article is the seed node of the graph"
+    }
+    if(this.clickedArticle.$title == null){
+      this.clickedArticleColorDescription = "This article has not finished loading"
+    }
+  }
 }
 
 //se om man kan sortere nodene etter år

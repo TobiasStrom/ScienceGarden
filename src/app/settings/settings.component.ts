@@ -1,6 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { SearchService } from '../services/search.service';
-import { CookieService } from 'ngx-cookie-service'
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-settings',
@@ -8,11 +8,11 @@ import { CookieService } from 'ngx-cookie-service'
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent implements OnInit {
-  maxNodesPerNode : number = 100000;
-  maxTotalNodes : number = 100000;
+  maxNodesPerNode : number = 10000;
+  maxTotalNodes : number = 10000;
 
   constructor(
-    private searchService: SearchService, private cookieService : CookieService
+    private cookieService : CookieService
   ) { }
 
   ngOnInit(): void {

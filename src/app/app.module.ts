@@ -17,6 +17,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCardModule } from '@angular/material/card';
 import { NavbarComponent } from './navbar/navbar.component';
 import { SettingsComponent } from './settings/settings.component';
+import { HashLocationStrategy, LocationStrategy  } from '@angular/common';
 
 
 
@@ -45,7 +46,9 @@ import { SettingsComponent } from './settings/settings.component';
     MatCardModule,
 
   ],
-  providers: [],
+  providers: [
+    {provide : LocationStrategy , useClass: HashLocationStrategy}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

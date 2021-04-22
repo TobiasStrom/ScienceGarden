@@ -104,18 +104,19 @@ export class SearchService{
           var authors : string[] = [];
           for(let id in responseData["Authors"]){
               authors.push(responseData["Authors"][id]);
-
           }
           var children : Article[] = [];
           var inCount: number = 0;
           var outCount : number = 0;
           if(state == 'in'){
 
-            for(let i = 0; i < Object.keys(responseData["InCitations"]).length && i < this.maxNodesPerNode; i++){
-              if(this.superTotalCount <= this.maxTotalNodes - 1){
-                var inArticle = new Article(responseData['InCitations'][i], null, null, null,null,null , null, null, null, "#3A5F0B", null);
-                children.push(inArticle);
-                this.superTotalCount++;
+            for(let i = 0; i < Object.keys(responseData["InCitations"]).length; i++){
+              if(this.superTotalCount < this.maxTotalNodes){
+                if(i < this.maxNodesPerNode){
+                  var inArticle = new Article(responseData['InCitations'][i], null, null, null,null,null , null, null, null, "#3A5F0B", null);
+                  children.push(inArticle);
+                  this.superTotalCount++;
+                }
                 inCount++;
               }
             }
@@ -125,13 +126,15 @@ export class SearchService{
 
           }
           else{
-            for (let i = 0; i < Object.keys(responseData["OutCitations"]).length && i < this.maxNodesPerNode; i++) {
+            for (let i = 0; i < Object.keys(responseData["OutCitations"]).length; i++) {
             //for(let id in responseData["OutCitations"]){
-              if(this.superTotalCount <= this.maxTotalNodes - 1){
-                var outArticle = new Article(responseData['OutCitations'][i], null, null, null,null,null , null, null, null, "#D2B48C", null);
-                children.push(outArticle);
+              if(this.superTotalCount < this.maxTotalNodes){
+                if(i < this.maxNodesPerNode){
+                  var outArticle = new Article(responseData['OutCitations'][i], null, null, null,null,null , null, null, null, "#D2B48C", null);
+                  children.push(outArticle);
+                  this.superTotalCount++;
+                }
                 outCount++;
-                this.superTotalCount++;
               }
 
             }
@@ -173,7 +176,9 @@ export class SearchService{
           var year = responseData["Year"];
 
           var type = "normal";
-          if(title.toUpperCase().includes("RETRACTED:")){
+
+
+          if(title.toUpperCase().includes("RETRACTED:") || title.toUpperCase().includes("WITHDRAWN:")){
             type = 'retracted';
           }
 
@@ -219,8 +224,11 @@ export class SearchService{
     const sub = this.fetchNodes(rootId, 'S2PaperId', type).subscribe(node => {
 
       this.root = node;
-      this.root.$type = 'root';
-      this.root.$color = '#8B4513';
+      if(this.root.$type != 'retracted'){
+        this.root.$type = 'root';
+      }
+
+
       this.value = true;
       this.countTotal++;
     });
@@ -332,6 +340,9 @@ export class SearchService{
       if(node.$isPublisherLicensed == true){
         node.$color = '#FFFF00'
       }
+      if(node.$isPublisherLicensed == true && node.$isOpenAccess == true){
+        node.$color = '#FFFF00'
+      }
       if(node.$type == 'exist'){
         node.$color = "blue";
         return node;
@@ -353,6 +364,9 @@ export class SearchService{
       }
       if(node.$isPublisherLicensed == true){
         node.$color = '#835d27'
+      }
+      if(node.$isPublisherLicensed == true && node.$isOpenAccess == true){
+        node.$color = '#FFFF00'
       }
       if(node.$type == 'exist'){
         node.$color = "#ebd8bd";

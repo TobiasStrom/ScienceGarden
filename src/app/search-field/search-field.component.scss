@@ -13,7 +13,7 @@
   background-color : $buttonColor;
 }
 .button-color:hover{
-  color: black;
+  color: $buttonTextHover;
   background-color : $buttonHoverColor;
 }
 

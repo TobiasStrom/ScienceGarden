@@ -29,7 +29,7 @@ export class SearchFieldComponent implements OnInit {
         this.buttonType = modus;
         break;
       case 'id':
-        this.buttonName = 'PaperID';
+        this.buttonName = 'S2PaperId';
         this.buttonType = modus;
         break;
         case 'doi':

@@ -17,7 +17,7 @@
   display: flex;
 }
 button{
-  margin: 10px;
+  margin-right: 10px;
 }
 .button-color{
   color: $buttonTextColor;
@@ -34,6 +34,9 @@ button{
   height: 50px;
   background-color: red;
   border-radius: 50%;
+}
+#info{
+  padding: 30px;
 }
 
 @media screen and (max-width: 992px) {
@@ -54,6 +57,6 @@ button{
   }
 }
 .button-color:hover{
-  color: $buttonTextColor;
+  color: $buttonTextHover;
   background-color : $buttonHoverColor;
 }
