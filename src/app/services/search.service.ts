@@ -178,7 +178,7 @@ export class SearchService{
           var type = "normal";
 
 
-          if(title.toUpperCase().includes("RETRACTED:") || title.toUpperCase().includes("WITHDRAWN:")){
+          if(title.toUpperCase().includes("RETRACTED:") || title.toUpperCase().includes("WITHDRAWN:") || title.toUpperCase().includes("RETRACTED ARTICLE:")){
             type = 'retracted';
           }
 
