@@ -37,10 +37,13 @@
 
 }
 .noResult{
-  height: 97vh;
-  padding-left: 20%;
-  padding: 0;
+  margin-top: 30vh;
+  min-height: 93vh;
+  text-align: center;
+}
 
+.noResult.h2{
+  padding-left: 0;
 }
 .pageNumber{
   font-size: 20px;

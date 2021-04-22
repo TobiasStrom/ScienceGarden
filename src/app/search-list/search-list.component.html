@@ -11,7 +11,7 @@
 
   </div>
 </div>
-<div *ngIf="list.length>0 && list[0].$S2PaperID == '-1'">
+<div *ngIf="list.length ==0 || list[0].$S2PaperID == '-1'">
   <div class="noResult">
     <h2>No Papers Found</h2>
     <p>Sorry, there are no results for <b>{{searchIn}}</b></p>

@@ -47,6 +47,9 @@ export class SearchService{
       )
       .pipe(
         map(responseData => {
+          if(responseData['error']){
+            return [];
+           }
           const searchArray: Article[] = [];
           for (var id in responseData) {
             if (responseData.hasOwnProperty('papers')) {
@@ -98,7 +101,9 @@ export class SearchService{
       )
       .pipe(
         map(responseData => {
-
+          if(responseData['error']){
+            return new Article('-1');
+           }
 
           var paperAbstract : string = String(responseData["PaperAbstract"]);
           var authors : string[] = [];
