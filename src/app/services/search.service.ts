@@ -178,7 +178,26 @@ export class SearchService{
           var type = "normal";
 
 
-          if(title.toUpperCase().includes("RETRACTED:") || title.toUpperCase().includes("WITHDRAWN:") || title.toUpperCase().includes("RETRACTED ARTICLE:")){
+          if(
+            title.toUpperCase().includes("RETRACTED:") ||
+            title.toUpperCase().includes("RETRACTED :") ||
+            title.toUpperCase().includes("WITHDRAWN:") ||
+            title.toUpperCase().includes("RETRACTED ARTICLE:")||
+            title.toUpperCase().includes("(RETRACTED ARTICLE)")||
+            title.toUpperCase().includes("(RETRACTED ARTICLE):")||
+            title.toUpperCase().includes("RETRACTED ARTICLE:")||
+            title.toUpperCase().includes("[RETRACTED]")||
+            title.toUpperCase().includes("(RETRACTED)")||
+            title.toUpperCase().includes("- RETRACTED")||
+            title.toUpperCase().includes("RETRACTED. \"A")||
+            title.toUpperCase().includes("RETRACTED PAPER:")||
+            title.toUpperCase().includes("(RETRACTED ARTICLE. ")||
+            title.toUpperCase().includes("TAXING: RETRACTED ARTICLE")||
+            title.toUpperCase().includes("RETRACTED Book Review:")||
+            title.toUpperCase().includes("THIS ARTICLE HAS BEEN RETRACTED")||
+            title.toUpperCase().includes("[ARTICLE RETRACTED]")||
+            title.toUpperCase().includes("RETRACTED REVIEW:")
+            ){
             type = 'retracted';
           }
 
