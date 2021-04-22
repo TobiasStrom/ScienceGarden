@@ -12,7 +12,7 @@
       <h3 *ngIf="countTotalLoadedOnScreen == 0">Articles loaded: {{countLoadedSinceLast}}</h3>
       <h3 *ngIf="countTotalLoaded < 20 && !done"><b>Need 20 articles or all to build, please wait...</b></h3>
       <h3 *ngIf="done"><b>No more articles to fetch</b></h3>
-      <button class="btn button-color" type="button" [disabled]="(stopValue || countTotalLoaded < 1) && !done" (click)="onBuildTree()">Build Graph</button>
+      <button class="btn button-color" type="button" [disabled]="(stopValue || countTotalLoaded < 20) && !done" (click)="onBuildTree()">Build Graph</button>
       <button class="btn button-color" type="button" [disabled]="done" (click)="stop()">Stop</button>
 
       <ng-container
