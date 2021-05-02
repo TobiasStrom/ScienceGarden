@@ -1,12 +1,12 @@
 @import '/src/styles/mixin.scss', '/src/styles/constants.scss';
 #container{
-    height: 94vh;
+    height: 82vh;
     width: 70%;
     z-index: 0;
 }
 #info{
   background-color: rgb(247, 247, 247);
-  height: 94vh;
+  height: 82vh;
   width: 30%;
   padding: 10px;
   overflow-y: scroll;
@@ -27,6 +27,7 @@ button{
 .btn {
   background-color: $buttonColor;
   color: $buttonTextColor;
+  margin-bottom: 10px;
 }
 
 .dot{

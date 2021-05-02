@@ -6,7 +6,7 @@ import {
   HttpParams,
   HttpEventType
 } from '@angular/common/http';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, first } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Article } from 'src/app/models/article.model';
 //import { Settings } from '../settings/settings.component'
@@ -19,11 +19,13 @@ export class SearchService{
 
   constructor(
     private http: HttpClient,
-    private cookieService : CookieService
+
     ) {
       this.updateMaxValues();
     }
-  startUrl : string = "http://dettefunker.no/api/article";
+  //startUrl : string = "http://dettefunker.no/api/article";
+  startUrl : string = "https://dettefunker.no/api/article";
+
 
 
    fetchPosts(title : string, method : string, page : number) {
@@ -116,11 +118,11 @@ export class SearchService{
           if(state == 'in'){
 
             for(let i = 0; i < Object.keys(responseData["InCitations"]).length; i++){
-              if(this.superTotalCount < this.maxTotalNodes){
+              if(this.totalCountTree < this.maxTotalNodes){
                 if(i < this.maxNodesPerNode){
-                  var inArticle = new Article(responseData['InCitations'][i], null, null, null,null,null , null, null, null, "#3A5F0B", null);
+                  var inArticle = new Article(responseData['InCitations'][i], null, null, null,null,null , null, null, null, "#dae0e6", null);
                   children.push(inArticle);
-                  this.superTotalCount++;
+                  this.totalCountTree++;
                 }
                 inCount++;
               }
@@ -133,11 +135,11 @@ export class SearchService{
           else{
             for (let i = 0; i < Object.keys(responseData["OutCitations"]).length; i++) {
             //for(let id in responseData["OutCitations"]){
-              if(this.superTotalCount < this.maxTotalNodes){
+              if(this.totalCountTree < this.maxTotalNodes){
                 if(i < this.maxNodesPerNode){
-                  var outArticle = new Article(responseData['OutCitations'][i], null, null, null,null,null , null, null, null, "#D2B48C", null);
+                  var outArticle = new Article(responseData['OutCitations'][i], null, null, null,null,null , null, null, null, "#dae0e6", null);
                   children.push(outArticle);
-                  this.superTotalCount++;
+                  this.totalCountTree++;
                 }
                 outCount++;
               }
@@ -171,7 +173,7 @@ export class SearchService{
           var isPublisherLicensed : boolean = false;
           if(String(responseData['IsPublisherLicensed']) === "true"){
             isPublisherLicensed = true;
-            console.log("This one i open for public")
+
           }
 
           var paperID = String(responseData['S2PaperID']);
@@ -244,15 +246,11 @@ export class SearchService{
     this.current = null;
     this.stopped = false;
 
-
-    const sub = this.fetchNodes(rootId, 'S2PaperId', type).subscribe(node => {
-
+    const sub = this.fetchNodes(rootId, 'S2PaperId', type).pipe(first()).subscribe(node => {
       this.root = node;
       if(this.root.$type != 'retracted'){
         this.root.$type = 'root';
       }
-
-
       this.value = true;
       this.countTotal++;
     });
@@ -262,23 +260,18 @@ export class SearchService{
     }
 
     sub.unsubscribe();
-    console.log('Started gathering information');
+
     this.BFSTreeBuilder(type, this.root);
   }
 
   child : Article = null;
   countTotal : number = 0;
-  superTotalCount: number = 1;
+  totalCountTree: number = 1;
 
   async BFSTreeBuilder(type: string, node: Article){
-    console.log("Inside tree builder");
-    console.log("Getting Max Values");
+    this.delay(1000);
     this.updateMaxValues();
-    console.log(
-      "Following Max Values received: \n" +
-      "MaxNodesPerNode: " + this.maxNodesPerNode +
-      "\n MaxTotalNodes: " + this.maxTotalNodes
-    );
+
     let BFSQueue : Article[] =[];
     BFSQueue.push(node);
     let limitReached = false;
@@ -290,10 +283,8 @@ export class SearchService{
       let currentNode : Article = BFSQueue.shift();
       this.queue.push(currentNode);
       if(this.nodes.includes(currentNode.$S2PaperID)){
-        console.log("- Node exists");
         currentNode.$children = [];
         currentNode.$type = "exist";
-        console.log('Exists'+ currentNode.$S2PaperID);
       }else{
         this.nodes.push(currentNode.$S2PaperID);
       }
@@ -301,13 +292,14 @@ export class SearchService{
 
       currentNode = this.setColor(currentNode, type);
       for(let i=0; i < currentNode.$children.length; i++){
-        if(i >= this.maxNodesPerNode) break;
-        if (this.stopped) break;
+        if (this.stopped){
+          this.done = true;
+          break;
+        }
         this.value = false;
-        const sub = this.fetchNodes(currentNode.$children[i].$S2PaperID, 'S2PaperId', type).subscribe(post => {
+        const sub = this.fetchNodes(currentNode.$children[i].$S2PaperID, 'S2PaperId', type).pipe(first()).subscribe(post => {
 
-          if(!this.stopped)
-          {
+          if(!this.stopped){
             if (this.countTotal >= this.maxTotalNodes){
               limitReached = true;
               this.value = true;
@@ -323,7 +315,6 @@ export class SearchService{
 
               if(this.countTotal % 10 == 0){
                 console.log(this.countTotal);
-
               }
 
             }
@@ -333,37 +324,48 @@ export class SearchService{
           }
         });
 
-        while(!this.value){
+        while(!this.value && !this.stopped){
           await this.delay(10);
         }
         sub.unsubscribe();
 
         if (limitReached){
-          console.log(this.root);
           this.done = true;
           break;
         }
       }
+      if (this.stopped || this.done){
+        this.done = true;
+        break;
+      }
     }
-    console.log('NO MORE NODES');
+
     this.done = true;
+    console.log('Done in BFSTree');
   }
   nodes : string[] = [];
   setColor(node: Article, type : String){
-    if(type == 'in'){
-      if(node.$type == "retracted"){
-        node.$color = "#FF0000";
-        return node;
-      }
+
+    let green = "#51d63d"
+    let green1 = "#6bb534"
+    let green2 = "#86942a"
+    let green3 = "#ad651d"
+    let green4 = "#d7320e"
+    let green5 = "#fe0200"
+
+    if(Number(localStorage.getItem('ColorBlind')) == 0){
+
       if(node.$type == "normal"){
         node.$color = "#5cb85c";
       }
       if(node.$isOpenAccess == true){
         node.$color = "#006400";
       }
+      /*
       if(node.$isPublisherLicensed == true){
         node.$color = '#FFFF00'
       }
+      */
       if(node.$isPublisherLicensed == true && node.$isOpenAccess == true){
         node.$color = '#FFFF00'
       }
@@ -373,6 +375,10 @@ export class SearchService{
       }
       if(node.$type == 'root') {
         node.$color = "#8B4513";
+      }
+      if(node.$type == "retracted"){
+        node.$color = "#FF0000";
+        return node;
       }
     }
     else{
@@ -409,10 +415,9 @@ export class SearchService{
     return node;
   }
 
-
   updateMaxValues(){
-    let maxNodesPerNode = Number(this.cookieService.get("MaxNodesPerNode"));
-    let maxTotalNodes = Number(this.cookieService.get("MaxTotalNodes"));
+    let maxNodesPerNode = Number(localStorage.getItem('MaxNodesPerNode'));
+    let maxTotalNodes = Number(localStorage.getItem('MaxTotalNodes'));
 
     if(!isNaN(maxNodesPerNode) && !isNaN(maxTotalNodes) && maxNodesPerNode > 0 && maxTotalNodes > 0){
       this.maxTotalNodes = maxTotalNodes;

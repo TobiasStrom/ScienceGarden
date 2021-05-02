@@ -1,6 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FooterComponent } from './footer/footer.component';
@@ -18,14 +17,13 @@ import { MatCardModule } from '@angular/material/card';
 import { NavbarComponent } from './navbar/navbar.component';
 import { SettingsComponent } from './settings/settings.component';
 import { HashLocationStrategy, LocationStrategy  } from '@angular/common';
-
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     FooterComponent,
-
     HomeComponent,
     InfoComponent,
     SearchFieldComponent,
@@ -44,6 +42,7 @@ import { HashLocationStrategy, LocationStrategy  } from '@angular/common';
     HttpClientModule,
     BrowserAnimationsModule,
     MatCardModule,
+    MatCheckboxModule
 
   ],
   providers: [

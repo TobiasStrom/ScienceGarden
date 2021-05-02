@@ -5,18 +5,16 @@
     [article]="article"
   ></app-search-list-item>
   <div class="navigate" *ngIf="list.length == 10">
-    <button [disabled]="page>1 ? false: true" class="btn button-color" (click)="nextPage(false)">Previous</button>
+    <button [disabled]="page > 1 ? false: true" class="btn button-color" (click)="nextPage(false)">Previous</button>
     <p class="pageNumber">Page: {{page}}</p>
     <button class="btn button-color" (click)="nextPage(true)">Next</button>
-
   </div>
 </div>
-<div *ngIf="list.length ==0 || list[0].$S2PaperID == '-1'">
-  <div class="noResult">
+<div *ngIf="list.length == 1 && list[0].$S2PaperID == '-1'">
+  <div class="box">
     <h2>No Papers Found</h2>
     <p>Sorry, there are no results for <b>{{searchIn}}</b></p>
   </div>
-
 </div>
 <div  *ngIf="list.length == 0">
   <div class="box">
@@ -25,6 +23,5 @@
     <h4>If searching for one specific article</h4>
     <h4>Search for it by S2PaperID or DOI</h4>
   </div>
-
 </div>
 

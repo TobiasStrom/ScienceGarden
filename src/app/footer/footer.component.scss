@@ -1,51 +1,17 @@
-
 @import '../../styles/constants.scss';
 @import '../../styles/mixin.scss';
 .footer{
   background-color: $frameColor;
-  z-index: 1;
-}
-.footerBox{
-  flex: 1;
-  padding: 20px;
-}
-
-.semanticInfo{
-  flex: 1.5;
-  display: flex;
-  text-align: center;
-}
-.semanticInfoBox{
-  flex: 1;
 }
 
 a {
   color: black;
 }
 
-p {
-  color: black;
-}
-
-@media screen and (max-width: 1400px) {
-  .footer{
-  background-color: $frameColor;
-  }
-  .semanticInfo{
-    flex: 1.5;
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-  }
-  img{
-    max-width: 270px;
-  }
-
-
-}
 img{
   max-width: 270px;
 }
+
 
 
 

@@ -10,8 +10,6 @@ export class Article implements d3.SimulationNodeDatum {
     fx?: number | null;
     fy?: number | null;
 
-
-
     private paperAbstract? : string;
     private authors? : string[];
     private children? : Article[];
@@ -259,7 +257,4 @@ export class Article implements d3.SimulationNodeDatum {
 	public set $outCitations(value: number) {
 		this.outCitations = value;
 	}
-
-
-
 }

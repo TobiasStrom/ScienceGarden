@@ -1,6 +1,5 @@
 <div class="all">
-    <div *ngIf="showGraph" class="Info" id="container">
-
+    <div class="Info" id="container">
     </div>
     <div  id="info" class="Info">
       <h1 *ngIf="in == false">Out-citation Graph</h1>
@@ -21,7 +20,6 @@
 
       <ng-template #articleIsClicked>
         <div *ngIf="clickedArticle.$title != null">
-
         <br>
         <h2>Article Information</h2>
           <p>Title: {{clickedArticle.$title}}</p>
@@ -80,26 +78,5 @@
         <br>
         <h2>Click on a node to display more information</h2>
       </ng-template>
-
-
-        <ng-container
-    *ngIf="in; then inInfo; else outInfo" >
-    </ng-container>
-    <ng-template #inInfo>
-
-
-    </ng-template>
-    <ng-template #outInfo>
-
-</ng-template>
-
-
-
-      </div>
-
-
+    </div>
 </div>
-<div *ngIf="!showGraph ">
-  <p>New more nodes to build tree</p>
-</div>
-

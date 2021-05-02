@@ -1,11 +1,9 @@
-<div class="search" *ngIf="haveSearch">
-  <form (ngSubmit)="onBuildTree($event)" class="form-inline my-2 my-lg-0">
+<div class="search">
+  <form (ngSubmit)="onSearch($event)" class="form-inline my-2 my-lg-0">
     <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" #searchInput>
     <div class="btn-group" appDropdown>
-      <button (click)="onBuildTree($event)" type="submit" class="btn button-color">{{buttonName}}</button>
-
+      <button (click)="onSearch($event)" type="button" class="btn button-color">{{buttonName}}</button>
       <button type="button" class="btn button-color dropdown-toggle dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-
       </button>
       <div>
         <div class="dropdown-menu dropdown-menu-right">
