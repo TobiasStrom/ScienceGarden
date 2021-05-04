@@ -12,7 +12,7 @@ import { SearchService } from '../services/search.service';
 export class SearchListComponent implements OnInit {
   page : number = 1;
   list : Array<Article> = [];
-  searchIn: string;
+  searchIn: string
   type : string;
 
   constructor(private searchService: SearchService, private route: ActivatedRoute) {}

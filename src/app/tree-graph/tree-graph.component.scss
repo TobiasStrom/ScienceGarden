@@ -4,13 +4,15 @@
     width: 70%;
     z-index: 0;
 }
+.breaktext{
+  word-break: break-all;
+}
 #info{
   background-color: rgb(247, 247, 247);
   height: 82vh;
   width: 30%;
   padding: 10px;
   z-index: 2;
-
 }
 .all{
   display: flex;
@@ -22,13 +24,11 @@ button{
   color: $buttonTextColor;
   background-color : $buttonColor;
 }
-
 .btn {
   background-color: $buttonColor;
   color: $buttonTextColor;
   margin-bottom: 10px;
 }
-
 .dot{
   width: 50px;
   height: 50px;
@@ -48,9 +48,7 @@ button{
   #container {
     height: 60vh;
     width: 100%;
-
   }
-
   #info{
     width: 100%;
     height: auto;
@@ -63,10 +61,7 @@ button{
     color: red;
     border-radius: 50%;
   }
-
 }
-
-
 .button-color:hover{
   color: $buttonTextHover;
   background-color : $buttonHoverColor;

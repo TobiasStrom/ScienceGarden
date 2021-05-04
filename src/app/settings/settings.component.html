@@ -1,24 +1,22 @@
 <div class="settings">
-
   <h2>Graph Settings</h2>
   <br>
   <br>
   <div class="container test w-75">
     <div class="d-flex justify-content-between row px-5">
       <h3 class="col-md-2 px-4 text-center text my-auto">Max children per node</h3>
-      <input class="col-md-8 my-3 px-0"type="range" value="{{maxNodesPerNode}}" min="1" max="100000" (change)="onSliderChangeNodesPerNode($event)">
+      <input class="col-md-8 my-3 px-0"type="range" value="{{maxNodesPerNode}}" min="1" max="10000" (change)="onSliderChangeNodesPerNode($event)">
       <div class= "col-md-2 my-auto">
-        <input class="field my-auto" type="number" id="maxNodesPerNodeBox" min="1" max="100000" value="{{maxNodesPerNode}}" (change)="onTextBoxChangeNodesPerNode($event)">
+        <input class="field my-auto" type="number" id="maxNodesPerNodeBox" min="1" max="10000" value="{{maxNodesPerNode}}" (change)="onTextBoxChangeNodesPerNode($event)">
       </div>
     </div>
   </div>
-
   <div class="container test w-75">
     <div class="d-flex justify-content-between row px-5">
       <h3 class="col-md-2 px-4 text-center text my-auto">Max nodes</h3>
-      <input class="col-md-8 my-3 px-0" type="range" id="MaxTotalNodesSlider" value="{{maxTotalNodes}}" min="1" max="100000" (change)="onSliderChangeTotalNodes($event)">
+      <input class="col-md-8 my-3 px-0" type="range" id="MaxTotalNodesSlider" value="{{maxTotalNodes}}" min="1" max="10000" (change)="onSliderChangeTotalNodes($event)">
       <div class= "col-md-2 my-auto">
-        <input class=" field"type="number" id="maxNodesTotalBox" min="1" max="100000" value="{{maxTotalNodes}}" (change)="onTextBoxChangeTotalNodes($event)">
+        <input class=" field"type="number" id="maxNodesTotalBox" min="1" max="10000" value="{{maxTotalNodes}}" (change)="onTextBoxChangeTotalNodes($event)">
       </div>
     </div>
   </div>

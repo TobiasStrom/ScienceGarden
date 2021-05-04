@@ -3,7 +3,6 @@
   @include displayFlex(column);
   background-color: $bodyColor;
   min-height: 97vh;
-  //text-align: center;
 }
 .infoText{
   max-width: 1500px;
@@ -31,14 +30,12 @@
   width: 50%;
   display: flex;
   flex-direction: column;
-  //align-items: center;
 }
 
 @media screen and (max-width: 500px) {
   .colors{
     display: flex;
     flex-direction: column;
-    //align-items: center;
   }
   .dot{
     width: 50px;

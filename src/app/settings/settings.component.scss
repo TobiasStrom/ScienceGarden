@@ -3,27 +3,10 @@
   @include displayFlex(column);
   height: 97vh;
   text-align: center;
-  //background-image: linear-gradient(rgb(255, 220, 0), $frameColor);
 }
-
-
-
-@keyframes gradient {
-	0% {
-		background-position: 0% 50%;
-	}
-	50% {
-		background-position: 100% 50%;
-	}
-	100% {
-		background-position: 0% 50%;
-	}
-}
-
 h3.text {
   font-size: 18px;
 }
-
 input.field {
   font-size: 18px;
   border: none;
@@ -34,7 +17,6 @@ input.field {
   margin-top: 1.6%;
   outline-color: #dae0e6;
 }
-
 div.test {
   background-color: #dae0e6;
   border-radius: 30px;
@@ -42,8 +24,6 @@ div.test {
   padding-bottom: 10px;
   margin-bottom: 2.5%;
 }
-
-
 .cardSetting{
   display: flex;
   flex-direction: row;
@@ -51,29 +31,22 @@ div.test {
   outline-color: #dae0e6;
   align-items: center;
   justify-content: center;
-
 }
-
 .slider{
   width: 70vw;
   max-width: 500px;
 }
-
 .inputField{
   text-align: center;
-  //width: 10vw;
   font-size: 18px;
   border: none;
-
   border-radius: 3px;
   margin-top: 1.6%;
   outline-color: #dae0e6;
 }
-
 .switch {
   font-size: $font-size-base;
   position: relative;
-
   input {
     position: absolute;
     height: 1px;
@@ -84,7 +57,6 @@ div.test {
     clip-path: inset(50%);
     overflow: hidden;
     padding: 0;
-
     + label {
       position: relative;
       min-width: calc(#{$switch-height} * 2);
@@ -98,7 +70,6 @@ div.test {
       vertical-align: middle;
       text-indent: calc(calc(#{$switch-height} * 2) + .5rem);
     }
-
     + label::before,
     + label::after {
       content: '';
@@ -109,14 +80,12 @@ div.test {
       bottom: 0;
       display: block;
     }
-
     + label::before {
       right: 0;
       background-color: $switch-bg;
       border-radius: $switch-border-radius;
       transition: $switch-transition;
     }
-
     + label::after {
       top: $switch-thumb-padding;
       left: $switch-thumb-padding;
@@ -126,35 +95,26 @@ div.test {
       background-color: $switch-thumb-bg;
       transition: $switch-transition;
     }
-
     &:checked + label::before {
       background-color: $switch-checked-bg;
     }
-
     &:checked + label::after {
       margin-left: $switch-height;
     }
-
     &:focus + label::before {
       outline: none;
       box-shadow: $switch-focus-box-shadow;
     }
-
     &:disabled + label {
       color: $switch-disabled-color;
       cursor: not-allowed;
     }
-
     &:disabled + label::before {
       background-color: $switch-disabled-bg;
     }
   }
-
-
-  // Large variation
   &.switch-lg {
     font-size: $font-size-lg;
-
     input {
       + label {
         min-width: calc(#{$switch-height-lg} * 2);
@@ -162,22 +122,18 @@ div.test {
         line-height: $switch-height-lg;
         text-indent: calc(calc(#{$switch-height-lg} * 2) + .5rem);
       }
-
       + label::before {
         width: calc(#{$switch-height-lg} * 2);
       }
-
       + label::after {
         width: calc(#{$switch-height-lg} - calc(#{$switch-thumb-padding} * 2));
         height: calc(#{$switch-height-lg} - calc(#{$switch-thumb-padding} * 2));
       }
-
       &:checked + label::after {
         margin-left: $switch-height-lg;
       }
     }
   }
-
   + .switch {
     margin-left: 1rem;
   }
@@ -185,50 +141,38 @@ div.test {
 
 
 @media screen and (max-width: 1200px) {
-
-
   .cardSetting{
     display: flex;
     flex-direction: column;
-
     border-radius: 30px;
     outline-color: #dae0e6;
    }
-
    .slider{
      width: 70vw;
      max-width: 500px;
    }
-
    .inputField{
      text-align: center;
      //width: 10vw;
      font-size: 18px;
      border: none;
-
      border-radius: 3px;
      margin-top: 1.6%;
      outline-color: #dae0e6;
    }
-
 }
-
 .example-h2 {
   margin: 10px;
 }
-
 .example-section {
   display: flex;
   align-content: center;
   align-items: center;
   height: 60px;
 }
-
 .example-margin {
   margin: 0 10px;
 }
-
-
 .settings{
   background-color: $bodyColor;
 }
