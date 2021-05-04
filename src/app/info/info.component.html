@@ -1,11 +1,159 @@
-<div class="info">
-  <h1>What can ..... do for you</h1>
-  <h2>We can find how articles move</h2>
-</div>
-<div class="inInfo">
 
-</div>
-<div class="outInfo">
+<div class="info">
+  <div class="infoText">
+    <h2>Getting Started</h2>
+    <p><b>Article Search</b></p>
+    <p>The search field may be used to either search for a specific article or multiple by Title, DOI or S2PaperId. You are advised to use DOI or S2PaperId when searching for a single article.</p>
+    <p><b>Results Navigation</b></p>
+    <p>After a search you will be taken to a results page containing zero, one or multiple results which you can navigate through using the "Next" and "Previous" buttons on the bottom of the page.
+      You can display the number of in - and out-citations and the abstract of an article using the "More Info"-button. To generate a graph, click on either the "In-citation Graph" or "Out-citation Graph" button.
+    </p>
+    <p><b>Graph</b></p>
+    <p>When displaying a graph for the first time, you will be presented with two windows. The graph is displayed in the window to your left. You can zoom in and out of the graph by scrolling and navigate by click and drag.
+      The panel on your right will contain "Total number of articles",
+      which is the total number of nodes displayed in the graph. Many of these nodes may not yet contain information on the articles they represent.  "Total number of articles loaded" corresponds to
+      the total number of nodes displayed, which contain information. "Articles loaded" corresponds to the number of articles which have been fetched since you either left the results page, or since last time
+      you pressed the "Build Graph"-button, which generates and displays the graph. The "Stop"-button ends the process of article retrieval to ensure minimal resource use - after this button is pressed you
+      cannot continue graph building without starting over. You can click on a node to display more information on a specific article. After clicking a node you can also set it as a new seed node by
+      clicking either "Set New Seed In-node" or "Set New Seed Out-node" (depending on whether you want to build an In-citation or Out-citation graph), followed by clicking the "Build Graph"-button.
+      For smartphone devices, you will also be presented with two
+      windows, but the panel will be displayed below the graph.
+    </p>
+    <p><b>Settings</b></p>
+    <p>Here, you can change "Graph Settings". If you want to set a maximum number of children per node (i.e. maximum number of in-citation nodes or out-citation nodes for every node in a graph),
+      you can use the number field or the slider for "Max children per node". If you want to set a maximum number of nodes for a graph, you change the value for "Max nodes", following the same approach.
+    </p>
+    <br>
+
+    <h2>Node Color</h2>
+    <div class="colors">
+      <div class="colorInfo">
+        <h3 class="text">Graph</h3>
+        <div class="container">
+          <div class="row py-2">
+            <div class="dot col-auto " style="background-color: #51d63d;"></div>
+            <p class="col-auto mt-3 ml-0">Article is open access</p>
+          </div>
+        </div>
+
+        <div class="container">
+          <div class="row py-2">
+            <div class="dot col-auto " style="background-color: #7d942a;"></div>
+            <p class="col-auto mt-3 ml-0">Article is not open access</p>
+          </div>
+        </div>
+        <div class="container">
+          <div class="row py-2">
+            <div class="dot col-auto " style="background-color: #fe0200;"></div>
+            <p class="col-auto mt-3 ml-0">Article has been retracted</p>
+          </div>
+        </div>
+        <div class="container">
+          <div class="row py-2">
+            <div class="dot col-auto " style="background-color: blue;"></div>
+            <p class="col-auto mt-3 ml-0">Article has duplicates that are present in the graph</p>
+          </div>
+        </div>
+        <div class="container">
+          <div class="row py-2">
+            <div class="dot col-auto " style="background-color: #8B4513;"></div>
+            <p class="col-auto mt-3 ml-0">This article is the seed node of the graph</p>
+          </div>
+        </div>
+        <div class="container">
+          <div class="row py-2">
+            <div class="dot col-auto " style="background-color: #dae0e6;"></div>
+            <p class="col-auto mt-3 ml-0">Article has not finished loading</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="colorInfo">
+        <h3 class="text">Deuteranomaly (Red/Green Color Blindness) Graph</h3>
+        <div class="container">
+          <div class="row py-2">
+            <div class="dot col-auto " style="background-color: #8B6900;"></div>
+            <p class="col-auto mt-3 ml-0">Article is open access</p>
+          </div>
+        </div>
+        <div class="container">
+          <div class="row py-2">
+            <div class="dot col-auto " style="background-color: #FFD89D;"></div>
+            <p class="col-auto mt-3 ml-0">Article is not open access</p>
+          </div>
+        </div>
+        <div class="container">
+          <div class="row py-2">
+            <div class="dot col-auto " style="background-color: #000099 ;"></div>
+            <p class="col-auto mt-3 ml-0">Article has been retracted</p>
+          </div>
+        </div>
+        <div class="container">
+          <div class="row py-2">
+            <div class="dot col-auto " style="background-color: #86c1ff;"></div>
+            <p class="col-auto mt-3 ml-0">Article has duplicates that are present in the graph</p>
+          </div>
+        </div>
+        <div class="container">
+          <div class="row py-2">
+            <div class="dot col-auto " style="background-color: #8B4513;"></div>
+            <p class="col-auto mt-3 ml-0">This article is the seed node of the graph</p>
+          </div>
+        </div>
+        <div class="container">
+          <div class="row py-2">
+            <div class="dot col-auto " style="background-color: #dae0e6;"></div>
+            <p class="col-auto mt-3 ml-0">Article has not finished loading</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <br>
+    <br>
+    <br>
+    <h2>Graph Definitions</h2>
+    <br>
+    <p><b>Node:</b> A scientific publication.</p>
+    <br>
+    <p><b>Current node:</b> The node the other nodes are viewed from.</p>
+    <br>
+    <p><b>Seed node:</b> The node from which a graph is built</p>
+    <br>
+    <p><b>In-citation node:</b> Article that cites the current node.</p>
+    <br>
+    <p><b>Out-citation node:</b> Paper cited by the current node.</p>
+    <br>
+    <p><b>Citation relationship:</b> An edge between two nodes.</p>
+    <br>
+    <p><b>In-citation graph:</b> Graph consisting of a seed node, nodes that cite the seed node and layers of nodes citing nodes in lower layers with citation relationships between nodes. Visualizes a seed node’s impact.</p>
+    <br>
+    <p><b>Out-citation graph:</b> Graph consisting of a seed node, nodes the seed node references and layers of nodes referenced by nodes in upper layers. Visualizes the papers the seed node depends on.</p>
+    <br>
+    <br>
+    <h2>Made In Collaboration With</h2>
+    <br>
+    <br>
+      <div class="col align-items-center px-0">
+        <div class="col mb-5 px-0">
+          <img class="img-oslo" src="/assets/Logomedsignatur_cmyk.png" width="70%">
+        </div>
+        <br>
+        <div class="col mt-5 px-0">
+          <img class="img-living" src="/assets/ltl.png" width="100%">
+        </div>
+        <br>
+        <br>
+        <div class="col mt-5 px-0">
+          <img class="img-living" src="/assets/AllenInstitute.png" width="75%">
+        </div>
+      </div>
+      <br>
+      <br>
+      <br>
+
+  </div>
+
 
 </div>
 

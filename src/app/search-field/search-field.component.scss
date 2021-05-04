@@ -1,9 +1,20 @@
+@import '../../styles/constants.scss';
+@import '../../styles/mixin.scss';
 @media screen and (max-width: 500px) {
   .form-control{
     width: 20px;
   }
 }
-
 .form-control{
   width: 200px;
 }
+.button-color{
+  color: $buttonTextColor;
+  background-color : $buttonColor;
+}
+.button-color:hover{
+  color: $buttonTextHover;
+  background-color : $buttonHoverColor;
+}
+
+

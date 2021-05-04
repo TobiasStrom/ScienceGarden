@@ -1,19 +1,43 @@
+@import '/src/styles/mixin.scss', '/src/styles/constants.scss';
 #container{
-    height: 94vh;
+    height: 82vh;
     width: 70%;
+    z-index: 0;
+}
+.breaktext{
+  word-break: break-all;
 }
 #info{
-  background-color: rgb(235, 235, 235);
-  height: 94vh;
+  background-color: rgb(247, 247, 247);
+  height: 82vh;
   width: 30%;
   padding: 10px;
-  overflow: scroll;
+  z-index: 2;
 }
 .all{
   display: flex;
 }
 button{
-  margin: 10px;
+  margin-right: 10px;
+}
+.button-color{
+  color: $buttonTextColor;
+  background-color : $buttonColor;
+}
+.btn {
+  background-color: $buttonColor;
+  color: $buttonTextColor;
+  margin-bottom: 10px;
+}
+.dot{
+  width: 50px;
+  height: 50px;
+  background-color: red;
+  border-radius: 50%;
+}
+#info{
+  padding: 30px;
+  overflow-y: scroll;
 }
 
 @media screen and (max-width: 992px) {
@@ -21,9 +45,24 @@ button{
     display: flex;
     flex-direction: column;
   }
+  #container {
+    height: 60vh;
+    width: 100%;
+  }
   #info{
     width: 100%;
     height: auto;
     min-height: 150px;
+    overflow: hidden;
   }
+  .dot{
+    width: 50px;
+    height: 50px;
+    color: red;
+    border-radius: 50%;
+  }
+}
+.button-color:hover{
+  color: $buttonTextHover;
+  background-color : $buttonHoverColor;
 }

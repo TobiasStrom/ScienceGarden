@@ -1,13 +1,8 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { first } from 'rxjs/operators';
 import { Article } from '../models/article.model';
 import { SearchService } from '../services/search.service';
-
-interface SearchMethods {
-  value: string;
-  viewValue: string;
-}
 
 @Component({
   selector: 'app-search-list',
@@ -15,87 +10,32 @@ interface SearchMethods {
   styleUrls: ['./search-list.component.scss']
 })
 export class SearchListComponent implements OnInit {
-
-  totalAngularPackages = "test";
-  out : string = "Info"
-  loading : boolean = false;
   page : number = 1;
   list : Array<Article> = [];
-
-  methods: SearchMethods[] = [
-    {value: 'title', viewValue: 'Title'},
-    {value: 'doi', viewValue: 'DOI'},
-    {value: 's2paperId', viewValue: 'S2PaperID'}
-  ];
-
-  selected : string;
-
-  @ViewChild('nameInput',{static:false}) nameInputRef: ElementRef;
-
-  //articles$: Observable;
-  searchIn: string;
+  searchIn: string
   type : string;
 
-  constructor(private http: HttpClient, private searchService: SearchService, private route: ActivatedRoute, private router: Router) {
-
-    this.searchIn = this.route.snapshot.paramMap.get('search');
-    //var type = this.route.snapshot.paramMap.get('type');
-  }
+  constructor(private searchService: SearchService, private route: ActivatedRoute) {}
 
 
   ngOnInit(): void {
-    //var searchIn : string;
+    // get the parameters for the Url
     this.route.queryParams.subscribe( params => {
       this.type = params['type'];
       this.searchIn = params['search'];
       this.onFetchArticle();
       this.list = [];
-      this.loading= true;
       this.page = 1;
-    }
-    );
-
-
+    });
   }
 
-  onFetchSearch(type: string, searchIn : string){
-    var encoded : string;
-    console.log(type);
-
-    encoded = btoa(searchIn);
-    if(type == "title"){
-      this.searchService.fetchPosts(encoded, this.selected, this.page).subscribe(
-        post => {
-          this.list = post;
-
-        }
-      );
-    }
-    else{
-      if(type == "id" || type == 'doi'){
-        encoded = searchIn;
-      }
-      this.searchService.fetchNodes(encoded, this.selected, "root").subscribe(
-        post => {
-          console.log(post);
-          this.list = [];
-          this.list.push(post);
-
-        }
-      );
-    }
-
-  }
-
-
+  // fetch information from search and adds it to the list visible on the page
   onFetchArticle(){
-    this.loading = true;
     var name = this.searchIn;
     var encoded : string;
-
     encoded = btoa(name);
     if(this.type == "title"){
-      this.searchService.fetchPosts(encoded, this.type , this.page).subscribe(
+      this.searchService.fetchPosts(encoded, this.type , this.page).pipe(first()).subscribe(
         post => {
           this.list = post;
         }
@@ -105,24 +45,18 @@ export class SearchListComponent implements OnInit {
       if(this.type == "id"){
         encoded = name;
       }
-
-      this.searchService.fetchNodes(encoded, this.type, "root").subscribe(
+      this.searchService.fetchNodes(encoded, this.type, "root").pipe(first()).subscribe(
         post => {
-          //console.log(post);
           this.list = [];
           this.list.push(post);
-          this.loading = false;
         }
       );
     }
-
-
-
   }
 
+  // go to next and previous page
   nextPage(yes: boolean){
     if(yes){
-
       this.page++;
       this.onFetchArticle();
     }else{
@@ -130,7 +64,5 @@ export class SearchListComponent implements OnInit {
       this.onFetchArticle();
     }
     window.scroll(0,0);
-
   }
-
 }

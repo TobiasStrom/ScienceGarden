@@ -1,37 +1,43 @@
-# ScienceGarden
+# Science Garden
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.0.5.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 11.0.5. This code is produced as a bachelor project for OsloMet University in Norway written by:
 
-## Development server
+Lars Kristian Bårdevik,
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Tobias Strøm 
 
-## Code scaffolding
+and 
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Emilis Bruzas
 
-## Build
+## In Collaboration with
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+Oslo Metropolitan University
 
-## Running unit tests
+Living Technology Lab
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Allen Institute for Artificial Intelligence
 
-## Running end-to-end tests
+and
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+Semantic Scholar
 
-## Further help
+## Special Thanks to
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Project Supervisors:
+
+Tom Glover 
+
+and 
+
+Trym Lindell
 
 
-## Install
+## Install Instructions
 
-npm install --save 
+npm install --save
 
-npm update 
+npm update
 
 ng update
 
@@ -49,6 +55,7 @@ npm install --save @ng-bootstrap/ng-bootstrap
 
 npm install --save bootstrap@4
 
+npm install ngx-cookie-service
 
-
+ng serve -o 
 

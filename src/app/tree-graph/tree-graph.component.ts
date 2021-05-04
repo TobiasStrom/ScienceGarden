@@ -1,12 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import * as d3 from 'd3';
-import { FunctionalityService } from '../services/functionality-service';
 import { SearchService } from '../services/search.service';
 import { HostListener } from "@angular/core";
-import { tree } from 'd3';
 import { Article } from '../models/article.model';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ThrowStmt } from '@angular/compiler';
+
 
 @Component({
   selector: 'app-tree-graph',
@@ -24,6 +22,8 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
   map: any;
   screenHeight: number;
   screenWidth: number;
+  graphWidth : number;
+  graphHeight : number;
   totalNodeCount: number;
   widthScreen : number;
   in : boolean = true;
@@ -32,51 +32,70 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
   clickedArticle : Article;
   articleClicked : boolean;
   firstLoad : boolean = true;
+  stopValue : boolean= false;
+  countTotalLoaded : number = 0;
+  countTotalUnloaded : number = 0;
+  countTotalLoadedOnScreen: number = 0;
+  countTotalUnloadedOnScreen: number = 0;
 
-
-
-
+  countLoadedSinceLast: number = 0;
+  done: boolean = false;
+  clickedArticleColorDescription : string = "";
+  pressed: boolean = false;
 
   constructor(
-    private functionalityService: FunctionalityService,
     private searchService: SearchService,
     private route : ActivatedRoute,
-    private router : Router
+    private router : Router,
+
   ) {
     this.getScreenSize();
+    setInterval(()=> {
+      this.countTotalLoaded = this.searchService.countTotal;
+      this.countTotalUnloaded = this.searchService.totalCountTree;
+      this.countLoadedSinceLast = this.countTotalLoaded - this.countTotalLoadedOnScreen;
+      this.done = this.searchService.done;
+    }, 1 * 1000);
   }
-  //selectedArticle : Article = this.searchService.selectedArticle;
 
+  /**
+   * To get the screen size of the device
+   */
   @HostListener('window:resize', ['$event'])
-    getScreenSize(event?) {
-          this.screenHeight = window.innerHeight;
-          this.screenWidth = window.innerWidth;
+  getScreenSize(event?) {
+        this.screenHeight = window.innerHeight;
+        this.screenWidth = window.innerWidth;
+  }
 
-    }
-  out: number = this.searchService.countTotal;
-
+  /**
+   * Builds the tree from data set in search service
+   * Uses d3 magic with some variables for sizing and customisation
+   */
   onBuildTree() {
+    this.countTotalLoadedOnScreen = this.countTotalLoaded;
+    this.countTotalUnloadedOnScreen = this.countTotalUnloaded;
 
-    console.log(this.searchService.root);
+    this.countTotalUnloaded = this.searchService.countTotal;
     var obj = d3.hierarchy(this.searchService.root);
     var count = obj.count();
-    console.log("Number of leaves: ", count.value)
     if (this.pressed && count.value > 0) {
       d3.select("svg").remove();
       var obj = d3.hierarchy(this.searchService.root);
       var count = obj.count();
-      console.log("Number of leaves: ", count.value)
+
       this.widthScreen = count.value * 275;
+
       if(this.widthScreen < 12000){
         this.widthScreen = 12000;
       }
+
       let draw = (source) => {
         let margin = { top: 20, right: 500, bottom: 20, left: 20 };
-        let width = this.widthScreen- margin.left - margin.right + 400;
+        let width = this.widthScreen - margin.left - margin.right + 400;
         let height = 500 - margin.top - margin.bottom;
-        let treemap = d3.tree<Article>().nodeSize([width/count.value, height/1000]);
+        let treemap = d3.tree<Article>().nodeSize([width/count.value, 0.5]);
         root = root.sort((a,b) => {return +a.$year - b.$year});
-        let treeData = treemap(root);//.sort((a,b) => { return +a.$year- +b.$year});
+        let treeData = treemap(root);
         let nodes = treeData.descendants();
         let links = treeData.descendants().slice(1);
         let max;
@@ -86,18 +105,17 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
         else{
           max = 5000;
         }
-
+        // To sett different length of edjes
         nodes.forEach((d) => {
           if(this.in){
             if(this.widthScreen * 0.4 > 5000){
-              max =  -this.widthScreen * 0.4;  //-(count * 10 * 0.4);
+              max =  -this.widthScreen * 0.4;
             }
           }else{
             if(this.widthScreen * 0.4 > 5000){
-              max =  this.widthScreen * 0.4;  //-(count * 10 * 0.4);
+              max =  this.widthScreen * 0.4;
             }
           }
-
           switch(d.depth){
             case 0 : {
               d.y = max * 0;
@@ -124,16 +142,6 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
               d.y = max * 0.95 + ( (d.depth - 4 ) * (max*0.10));
             }
           }
-          /*
-          if(d.depth == 0){
-            d.y = d.depth * -500;
-          }
-          else if(){
-
-          }else{
-            d.y = (d.depth * -100) - 900;
-          }
-          */
 
         });
 
@@ -151,15 +159,15 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
             (d) => 'translate(' + source.x0 + ',' + source.y0 + ')'
           )
           .on('click', (d) => {
-            this.clickedArticle = this.functionalityService.click(d).data;
+            this.clickedArticle = d.data;
             draw(this.clickedArticle);
             this.articleClicked = true;
+            this.updateColorDescription();
           });
 
         nodeEnter
           .append('circle')
           .attr('class', 'node')
-          //.attr("stroke", "black")
           .attr('stroke-width', '1.5px')
           .attr('fill', (d) => (d['_children'] ? 'bluelightsteelblue' : '#fff'))
           .attr('r', 1e-6);
@@ -173,9 +181,8 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
           .attr('transform', (d) =>
           'rotate(330)')
           .attr('text-anchor', (d) =>'end'
-          //d.children || d['_children'] ? 'end' : 'start'
           )
-          .text((d) => /*d.data['type'] + ' ' +*/ d.data['year']);
+          .text((d) =>  d.data['year']);
 
         let nodeUpdate = nodeEnter.merge(<any>node);
 
@@ -191,7 +198,6 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
             d['_children'] ? 'lightsteelblue' : d['data']['color']
           )
           .attr('cursor', 'pointer');
-
 
         let nodeExit = node
           .exit()
@@ -213,7 +219,6 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
         let link = g.selectAll('path.link').data(links, (d) => d['id']);
 
         // Work on enter links, draw straight lines
-
         let linkEnter = link
           .enter()
           .insert('path', 'g')
@@ -274,36 +279,34 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
         return path;
       };
 
-      let margin = { top: 30, right: 200, bottom: 500, left: 200 };
-      let width = this.screenWidth -margin.left - margin.right;  //2500 - margin.left - margin.right + 400;
-      let height = this.screenHeight - margin.top - margin.bottom;
+      let ratio = 0.82;
+      let height = this.screenHeight * 0.82 - 500;
+      this.graphWidth = this.screenWidth * 0.693
 
+      if(this.screenWidth <= 992){
+        ratio = 0.60;
+        this.graphWidth = this.screenWidth * 0.9665;
+        height = this.screenHeight * 0.82 - 300;
+      }
+
+      let margin = { top: 30, right: 200, bottom: 500, left: 200 };
+      let width = this.graphWidth;
 
       //The following three variables determine the initial postion and scale of the graph
       let translateX = width/2;
       let translateY = height;
       let scale = (width/500)/count.value;
 
-
       let transform = d3.zoomIdentity.translate(translateX, translateY).scale(scale);
-      if(this.firstLoad){
-        if(this.screenWidth > 992){
-          this.screenWidth = this.screenWidth * 0.7;
-        }
-        else{
-          this.screenWidth = this.screenWidth* 0.95
-        }
 
-        this.firstLoad = false;
-      }
       let zoom = d3.zoom().on('zoom', function () {
         svg.attr('transform', d3.event.transform);
       })
       let svg = d3
         .select('#container')
         .append('svg')
-        .attr('width', this.screenWidth)//width + margin.right + margin.left)
-        .attr('height', height + margin.top + margin.bottom)
+        .attr('width', this.graphWidth)
+        .attr('height', this.screenHeight * ratio)
         .call(d3.zoom().transform, transform)
         .call(zoom)
         .append('g')
@@ -316,14 +319,17 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
       let root;
       root = this.searchService.root;
       root = d3.hierarchy(root);
-      root.x0 = this.screenWidth/ 2;
-      root.y0 = 0;
+      root.x0 = 0;
+      root.y0 =  0;
+
       draw(root);
-      console.log('done building');
     }
   }
 
-  ngOnInit() {
+  /**
+   * sets default values and initial position for the window
+   */
+   ngOnInit() {
     this.articleClicked = false;
     window.scroll(0,0);
     this.getScreenSize();
@@ -331,25 +337,26 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
     this.route.queryParams.subscribe( params => {
       var type = params['state'];
       this.paperId = params['paperId'];
-      //done = true;
-    })
+    });
   }
 
+  /**
+   * Cleans up the workspace and stops building of the tree graph
+   */
   ngOnDestroy() {
-    console.log('Den skal nå stoppes')
     this.resetVariables();
+    this.stop();
   }
-  pressed: boolean = false;
 
-
+  /**
+   * Gets article information based from search parameters and builds the tree
+   */
   onFetchArticle() {
     var type;
-    var searchIn;
-    //var done = false;
+
     this.route.queryParams.subscribe( params => {
       type = params['state'];
       this.paperId = params['paperId'];
-      //done = true;
     })
     if(type == 'in'){
       this.in = true;
@@ -358,53 +365,76 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
       this.in = false;
     }
 
-    //while(!done);
-
-    this.searchService.buildTree(
-      type, this.paperId
-      //'6e1013b0e858e322217a923caed3cc66aa615d08' //Super high at 50
-      //'f617e842e6b5f06a49aa0299812df889dc308d5c' // Round 80 nodes
-      //'516ec6346b0c0555663e3a74d3db40bd2c8fcf38' //This have a node that is retracted
-      //'4a28ca8a14021c83d554852fdc6642b9a41e839e' //Retracted
-      //'e6fadc508584b0a70cbd0f8b8ceb63071aeaa8b8' //
-      //'e49b19ea3a134f83d5498d32ec904ae67ab760bb' // THIS FAILS
-    );
+    this.searchService.buildTree(type, this.paperId);
     this.pressed = true;
     this.showGraph = true;
   }
 
+  /**
+   * Stops the building of the tree
+   */
   stop() {
-    this.searchService.stopped = true
+    this.searchService.stopped = true;
   }
-
 
   /*
    *  Function that redraws a graph for a selected node
    *  Required variables below
   */
- 
-  onRedraw(state: string) {
-    //cleanup
-    console.log('Den skal nå stoppes');
+  async onRedraw(state: string) {
+    this.stop(); // Stops the building of the previous tree
+    await this.searchService.delay(1000); // Waits to ensure that the building has stopped
     let newRootArticle = this.clickedArticle;
     this.resetVariables();
-    if (state != "in") {
-      this.in = false;
-    }
-
+    state != "in" ? this.in = false : this.in = true;
+    this.router.navigate(['tree'], {
+      queryParams: {
+        paperId: newRootArticle.$S2PaperID,
+        state: state,
+      },
+    } );
     this.searchService.buildTree(state, newRootArticle.$S2PaperID);
   }
 
-
+  /**
+   * Resets all variables used for building a tree
+   */
   resetVariables() {
     this.searchService.stopped = true;
-    this.searchService.count = 0;
     this.searchService.countTotal = 0;
-    this.searchService.superTotalCount = 1;
+    this.searchService.totalCountTree = 1;
     this.searchService.root = this.clickedArticle;
     this.articleClicked = false;
     this.clickedArticle = null;
     this.searchService.queue = [];
     this.searchService.child = null;
+    this.countTotalLoadedOnScreen = 0;
+    this.countTotalLoaded = 0;
+    this.countTotalUnloaded = 0;
+    this.countLoadedSinceLast = 0;
+  }
+  /**
+   * Set the right color description
+   */
+  updateColorDescription(){
+    let type = this.clickedArticle.$type;
+    if(type == "normal"){
+      this.clickedArticleColorDescription = "This article is not open access";
+    }
+    if(this.clickedArticle.$isOpenAccess){
+      this.clickedArticleColorDescription = "This article is open access";
+    }
+    if(type == "retracted"){
+      this.clickedArticleColorDescription = "This article has been retracted";
+    }
+    if(type == "exist"){
+      this.clickedArticleColorDescription = "This article has duplicates that are present in the graph"
+    }
+    if(type == "root"){
+      this.clickedArticleColorDescription = "This article is the seed node of the graph"
+    }
+    if(this.clickedArticle.$title == null){
+      this.clickedArticleColorDescription = "This article has not finished loading"
+    }
   }
 }

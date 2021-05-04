@@ -1,6 +1,5 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, Input, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, Input } from '@angular/core';
+import { Router } from '@angular/router';
 import { Article } from 'src/app/models/article.model';
 import { SearchService } from 'src/app/services/search.service';
 
@@ -9,28 +8,23 @@ import { SearchService } from 'src/app/services/search.service';
   templateUrl: './search-list-item.component.html',
   styleUrls: ['./search-list-item.component.scss']
 })
-export class SearchListItemComponent implements OnInit {
+export class SearchListItemComponent{
   @Input() article : Article;
   moreInfo = false;
-
-  open: boolean = false;
-  out : string  = "Info";
   noMoreInfo = false;
-  articles : Article;
   buttonInDisable: boolean = false;
   buttonOutDisable: boolean = false;
 
-  constructor(private http: HttpClient, private searchService: SearchService, private router: Router, private route: ActivatedRoute) { }
+  constructor(private searchService: SearchService, private router: Router) {}
 
-  ngOnInit(): void {
-  }
-  onNavigate(paperId: string, state : string){
+  /**
+    * When user choose to build an inn or out graph
+      if it the article don't have any in-citations or out-citations
+      the corresponding button will be deactivated
+  */
+  onNavigate(paperId:string, state : string){
     this.searchService.fetchNodes(paperId, 'id', state).subscribe(
       post => {
-
-        console.log(state)
-
-
         if(post.$S2PaperID != '-1'){
           this.article = post;
           if(state == 'in' && post.$inCitations > 0){
@@ -39,42 +33,37 @@ export class SearchListItemComponent implements OnInit {
                 paperId: paperId,
                 state: state,
               }
-            } );
+            });
           }
           if(state == 'in' && post.$inCitations == 0){
-          this.buttonInDisable = true;
+            this.buttonInDisable = true;
           }
-
           if(state == 'out' && post.$outCitations > 0){
-
             this.router.navigate(['tree'], {
               queryParams: {
                 paperId: paperId,
                 state: state,
               }
-            } );
-
+            });
           }
           if(state == 'out' && post.$outCitations == 0){
             this.buttonOutDisable = true;
           }
-
         }
         else{
-
-          this.noMoreInfo = true; // One article when search for test, page 5, 8 from top;
+          this.noMoreInfo = true;
         }
-
       }
     )
-
   }
 
-
+  /**
+    * When the more info button i pressed.
+      it return more information and make the card bigger
+   */
   onMoreInfo(paperId: string, state : string){
     this.searchService.fetchNodes(paperId, 'id', 'root').subscribe(
       post => {
-        console.log(post);
         if(post.$S2PaperID != '-1'){
           if(post.$outCitations == 0){
             this.buttonOutDisable = true;
@@ -84,11 +73,8 @@ export class SearchListItemComponent implements OnInit {
           }
           this.article = post;
         }
-
-
-
         else{
-          this.noMoreInfo = true; // One article when search for test, page 5, 8 from top;
+          this.noMoreInfo = true;
         }
         if(post.$DOI == 'null'){
           post.$DOI = "This paper has no DOI"

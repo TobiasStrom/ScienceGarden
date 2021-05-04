@@ -3,31 +3,42 @@ import {
   HttpClient,
   HttpHeaders,
   HttpParams,
-  HttpEventType
+
 } from '@angular/common/http';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, first } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 import { Article } from 'src/app/models/article.model';
 
 
-
 @Injectable({ providedIn: 'root' })
 export class SearchService{
-  constructor(private http: HttpClient) {}
-  startUrl : string = "http://dettefunker.no/api/article";
+  maxNodesPerNode : number = 1000;
+  maxTotalNodes : number = 10000;
+  root : Article = null;
+  current : Article;
+  title : string;
+  value: boolean = false;
+  stopped : boolean = false;
+  done: boolean = false;
+  queue : Article[] = [];
+  child : Article = null;
+  countTotal : number = 0;
+  totalCountTree: number = 1;
+  nodes : string[] = [];
 
-  maxTotalNodes = 10000;
+  constructor( private http: HttpClient) { this.updateMaxValues()}
+    startUrl : string = "https://api.sciencegarden.org/api/article";
 
+    /**
+     * Returns a list of articles based on a search query by title
+     */
    fetchPosts(title : string, method : string, page : number) {
     var url : string = "";
     let searchParams = new HttpParams();
     searchParams = searchParams.append('state', 'root');
     searchParams = searchParams.append('bySearchEngine', 'no');
-
     url = this.startUrl+"/title/"+title;
     searchParams = searchParams.append('pageID', page.toString());
-
-
 
     return this.http
       .get<{ [key: string]: Article }>(
@@ -39,6 +50,9 @@ export class SearchService{
       )
       .pipe(
         map(responseData => {
+          if(responseData['error']){
+            return [new Article('-1')];
+           }
           const searchArray: Article[] = [];
           for (var id in responseData) {
             if (responseData.hasOwnProperty('papers')) {
@@ -46,13 +60,10 @@ export class SearchService{
                 var doi = "";
                 if(responseData[id][element]['DOI'] != ''){
                     doi = responseData[id][element]['DOI'];
-                }
-                else
-                {
+                }else{
                   doi = "This paper has no DOI"
                 }
                 let article = new Article(responseData[id][element]['S2PaperID'], null , [], [], doi, false, false,  responseData[id][element]['Title'], null);
-
                 searchArray.push(article);
               }
             }
@@ -66,17 +77,15 @@ export class SearchService{
       );
   }
 
+  /**
+   * Gets a node from API with information based on a search query by S2PaperID or DOI.
+   */
   fetchNodes(input: string, method: string, state: string) {
-    var url : string = "";
-    let searchParams = new HttpParams();
-
-    searchParams = searchParams.append('state', state);
+    var url : string = this.startUrl+"/S2PaperID/"+input;
+    let searchParams = new HttpParams().append('state', 'root');
 
     if(method == "doi"){
       url = this.startUrl+"/DOI/"+input;
-    }
-    else{
-      url = this.startUrl+"/S2PaperID/"+input;
     }
 
     return this.http
@@ -90,46 +99,55 @@ export class SearchService{
       )
       .pipe(
         map(responseData => {
+          if(responseData['error']){
+            return new Article('-1');
+           }
+
           var paperAbstract : string = String(responseData["PaperAbstract"]);
           var authors : string[] = [];
           for(let id in responseData["Authors"]){
               authors.push(responseData["Authors"][id]);
-
           }
           var children : Article[] = [];
           var inCount: number = 0;
           var outCount : number = 0;
+
+          // If the tree is in-tree it fills the node with all the In-citations
           if(state == 'in'){
-            for(let id in responseData['InCitations']){
-              if(this.superTotalCount <= this.maxTotalNodes){
-                var inArticle = new Article(responseData['InCitations'][id], null, null, null,null,null , null, null, null, "#3A5F0B", null);
-                children.push(inArticle);
-                this.superTotalCount++;
-                inCount++;
+
+            for(let i = 0; i < Object.keys(responseData["InCitations"]).length; i++){
+              if(this.totalCountTree < this.maxTotalNodes){
+                if(i < this.maxNodesPerNode){// Only add to list if [i] is les than [maxNodesPerNode]
+                  var inArticle = new Article(responseData['InCitations'][i], null, null, null,null,null , null, null, null, "#dae0e6", null);
+                  children.push(inArticle);
+                  this.totalCountTree++;
+                }
+                inCount++; // Keeps track of InCitation count to display later
               }
             }
             for(let id in responseData["OutCitations"]){
-              outCount++;
+              outCount++; // Keeps track of outCitation count to display later
             }
 
-          }
-          else{
-            for(let id in responseData["OutCitations"]){
-              if(this.superTotalCount <= this.maxTotalNodes){
-                var outArticle = new Article(responseData['OutCitations'][id], null, null, null,null,null , null, null, null, "#D2B48C", null);
-                children.push(outArticle);
-                outCount++;
-                this.superTotalCount++;
+          }else{ // If the tree is out-tree it fills the node with all the out-citations
+            for (let i = 0; i < Object.keys(responseData["OutCitations"]).length; i++) {
+              if(this.totalCountTree < this.maxTotalNodes){
+                if(i < this.maxNodesPerNode){ // only add to list if [i] is les than [maxNodesPerNode]
+                  var outArticle = new Article(responseData['OutCitations'][i], null, null, null,null,null , null, null, null, "#dae0e6", null);
+                  children.push(outArticle);
+                  this.totalCountTree++;
+                }
+                outCount++; // Keeps track of outCitation count to display later
               }
 
             }
             for(let id in responseData['InCitations']){
-              inCount++;
+              inCount++;  // Keeps track of InCitation count to display later
             }
 
           }
 
-
+          // Checks if DOI exists and either assigns it as the value, or assigns it as "This paper has no DOI"
           var doi = "";
           if (responseData.hasOwnProperty('Doi')) {
             if(String(responseData['Doi']) != '' || typeof(responseData['Doi']) != "string"){
@@ -141,8 +159,6 @@ export class SearchService{
 
           }
 
-
-
           var isOpenAccess : boolean = false;
           if(String(responseData['IsOpenAccess']) === "true"){
             isOpenAccess = true;
@@ -151,21 +167,38 @@ export class SearchService{
           var isPublisherLicensed : boolean = false;
           if(String(responseData['IsPublisherLicensed']) === "true"){
             isPublisherLicensed = true;
-            console.log("This one i open for public")
           }
 
           var paperID = String(responseData['S2PaperID']);
-
-
           var title = String(responseData['Title']);
           var year = responseData["Year"];
-
           var type = "normal";
-          if(title.toUpperCase().includes("RETRACTED:")){
+
+          // Checks if the title contains some of the keywords indicating it has been retracted
+          if(
+            title.toUpperCase().includes("RETRACTED:") ||
+            title.toUpperCase().includes("RETRACTED :") ||
+            title.toUpperCase().includes("WITHDRAWN:") ||
+            title.toUpperCase().includes("RETRACTED ARTICLE:")||
+            title.toUpperCase().includes("(RETRACTED ARTICLE)")||
+            title.toUpperCase().includes("(RETRACTED ARTICLE):")||
+            title.toUpperCase().includes("RETRACTED ARTICLE:")||
+            title.toUpperCase().includes("[RETRACTED]")||
+            title.toUpperCase().includes("(RETRACTED)")||
+            title.toUpperCase().includes("- RETRACTED")||
+            title.toUpperCase().includes("RETRACTED. \"A")||
+            title.toUpperCase().includes("RETRACTED PAPER:")||
+            title.toUpperCase().includes("(RETRACTED ARTICLE. ")||
+            title.toUpperCase().includes("TAXING: RETRACTED ARTICLE")||
+            title.toUpperCase().includes("RETRACTED Book Review:")||
+            title.toUpperCase().includes("THIS ARTICLE HAS BEEN RETRACTED")||
+            title.toUpperCase().includes("[ARTICLE RETRACTED]")||
+            title.toUpperCase().includes("RETRACTED REVIEW:")
+            ){
             type = 'retracted';
           }
 
-
+          // Builds an article with the data received and returns it
           let article = new Article(paperID, paperAbstract, authors, children, doi, isOpenAccess,
             isPublisherLicensed, title, Number(year), null,  type, inCount, outCount);
 
@@ -175,86 +208,95 @@ export class SearchService{
 
       catchError(errorRes => {
           // Send to analytics server
-          return throwError('FEil');
+          return throwError('Vi får en feil');
         })
       );
   }
 
-  root : Article = null;
-  current : Article;
-  title : string;
-  value: boolean = false;
-  count: number = 0;
-  stopped : boolean = false;
-  //nodes : Article;
-
-
-  queue : Article[] = [];
-
-
+  /**
+   *  A delay function for utility purposes. Waits a given amount of seconds
+   */
   async delay(ms: number) {
-    await new Promise<void>(resolve => setTimeout(()=>resolve(), ms)).then();
+    await new Promise<void>(resolve => setTimeout(()=>resolve(), ms));
   }
 
-
+  /**
+   * A method called when building a tree. Takes the input node and builds it gradually using BFSSTreeBuilder function
+   */
   async buildTree(type: string, rootId : string){
-    this.value = false;
+    // resets default values
+    this.value = false; // a variable used to recognise that subscription has finished
     this.current = null;
     this.stopped = false;
-    this.count = 0;
 
-    const sub = this.fetchNodes(rootId, 'S2PaperId', type).subscribe(node => {
-
+    const sub = this.fetchNodes(rootId, 'S2PaperId', type).pipe(first()).subscribe(node => {
       this.root = node;
-      this.root.$type = 'root';
-      this.root.$color = '#8B4513';
+      if(this.root.$type != 'retracted'){
+        this.root.$type = 'root';
+      }
       this.value = true;
       this.countTotal++;
     });
-
+    // Wait for responce
     while(!this.value){
       await this.delay(10);
     }
 
     sub.unsubscribe();
-    console.log('Started gathering information');
     this.BFSTreeBuilder(type, this.root);
   }
 
-  child : Article = null;
-  countTotal : number = 0;
-  superTotalCount: number = 1;
 
+  /**
+   * A method for filling the root node with its citations and its data.
+   *
+   * Description:
+   *  1. It uses a queue to fill in the citations for a layer.
+   *  2. It checks if limits have been reached before proceeding
+   *  3. A node from queue is popped, its children are received with data and added to the queue for future building
+   *  4. If the queue is not empty, it moves for the next node in the queue
+   *
+   * Stop cases:
+   *  1. The tree is finished building
+   *  2. The tree has reached a limit set in settings
+   *  3. User input has stopped the building
+   */
   async BFSTreeBuilder(type: string, node: Article){
+     this.updateMaxValues(); // Updates max values set from settings
+
+    // Queue is created and root node added
     let BFSQueue : Article[] =[];
     BFSQueue.push(node);
-    let limitReached = false;
 
-    while (BFSQueue.length > 0 && !this.stopped){
+    // Default values
+    let limitReached = false;
+    this.nodes = []; // A list of total nodes in the tree
+    this.done = false;
+
+    while (BFSQueue.length > 0 && !this.stopped){ // [this.stopped] is a variable determining if the tree building has been cancelled by user input
       if(limitReached) break;
       let currentNode : Article = BFSQueue.shift();
       this.queue.push(currentNode);
-      if(this.nodes.includes(currentNode.$S2PaperID)){
+      if(this.nodes.includes(currentNode.$S2PaperID)){ // if it includes s2paperId then it exists in Semantic database and has data
         currentNode.$children = [];
         currentNode.$type = "exist";
-        //console.log('Exists'+ currentNode.$S2PaperID);
       }else{
         this.nodes.push(currentNode.$S2PaperID);
       }
 
-
       currentNode = this.setColor(currentNode, type);
-      for(let i=0; i < currentNode.$children.length; i++){
+      for(let i=0; i < currentNode.$children.length; i++){ // Adds all children with data into the database
+        if (this.stopped){
+          break;
+        }
         this.value = false;
-        const sub = this.fetchNodes(currentNode.$children[i].$S2PaperID, 'S2PaperId', type).subscribe(post => {
+        const sub = this.fetchNodes(currentNode.$children[i].$S2PaperID, 'S2PaperId', type).pipe(first()).subscribe(post => { // get information from api
 
-          if(!this.stopped)
-          {
-            if (this.countTotal >= this.maxTotalNodes + 1){
+          if(!this.stopped){
+            if (this.countTotal >= this.maxTotalNodes){ // Checks if limits have been reached
               limitReached = true;
               this.value = true;
             }else{
-
               currentNode.$children[i] = post;
               this.child = post;
               currentNode.$children[i] = this.setColor(currentNode.$children[i], type);
@@ -262,44 +304,37 @@ export class SearchService{
               BFSQueue.push(post);
               this.value = true;
               this.countTotal++;
-              if(this.countTotal % 10 == 0){
-                console.log(this.countTotal);
-              }
-
             }
-          }else{
-            console.log("STOOOOOPPPPP");
           }
         });
 
-        while(!this.value){
+        while(!this.value && !this.stopped){ // wait for response
           await this.delay(10);
         }
         sub.unsubscribe();
 
-        if (limitReached){
-          console.log(this.root);
+        if (limitReached){ // Checks if limits have been reached
           break;
         }
       }
-    }
-    console.log('Done');
-  }
-  nodes : string[] = [];
-  setColor(node: Article, type : String){
-    if(type == 'in'){
-      if(node.$type == "retracted"){
-        node.$color = "#FF0000";
-        return node;
+      if (this.stopped || this.done){ // Exit conditions
+        break;
       }
+    }
+    this.done = true;
+  }
+
+  /**
+   * A method that determines what color a node should be displayed as
+   */
+  setColor(node: Article, type : String){
+    if(Number(localStorage.getItem('ColorBlind')) == 0){ // Checks if colorblind mode has been enabled. If 0, then not enabled.
+
       if(node.$type == "normal"){
-        node.$color = "#5cb85c";
+        node.$color = "#7d942a";
       }
       if(node.$isOpenAccess == true){
-        node.$color = "#006400";
-      }
-      if(node.$isPublisherLicensed == true){
-        node.$color = '#FFFF00'
+        node.$color = "#51d63d";
       }
       if(node.$type == 'exist'){
         node.$color = "blue";
@@ -308,35 +343,45 @@ export class SearchService{
       if(node.$type == 'root') {
         node.$color = "#8B4513";
       }
-    }
-    else{
       if(node.$type == "retracted"){
         node.$color = "#FF0000";
         return node;
       }
+    }else{
+      if(node.$type == "retracted"){
+        node.$color = "#000099";
+        return node;
+      }
       if(node.$type == "normal"){
-        node.$color = "brown";
+        node.$color = "#FFD89D";
       }
       if(node.$isOpenAccess == true){
-        node.$color = "#c69146";
-      }
-      if(node.$isPublisherLicensed == true){
-        node.$color = '#835d27'
+        node.$color = "#8B6900";
       }
       if(node.$type == 'exist'){
-        node.$color = "#ebd8bd";
+        node.$color = "#86c1ff";
         return node;
       }
       if(node.$type == 'root') {
         node.$color = "#8B4513";
       }
     }
-
-    /*
-    if(node.$children.length == 0){
-      node.$color = "orange";
-    }
-    */
     return node;
+  }
+
+  /**
+   * A method that retrieves the max-values set in settings
+   */
+  updateMaxValues(){
+    let maxNodesPerNode = Number(localStorage.getItem('MaxNodesPerNode'));
+    let maxTotalNodes = Number(localStorage.getItem('MaxTotalNodes'));
+
+    if(!isNaN(maxNodesPerNode) && !isNaN(maxTotalNodes) && maxNodesPerNode > 0 && maxTotalNodes > 0){
+      this.maxTotalNodes = maxTotalNodes;
+      this.maxNodesPerNode = maxNodesPerNode;
+    } else{
+      this.maxTotalNodes = 10000;
+      this.maxNodesPerNode = 10000;
+    }
   }
 }

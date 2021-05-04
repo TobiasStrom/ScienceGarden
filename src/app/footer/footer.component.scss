@@ -1,64 +1,23 @@
-
 @import '../../styles/constants.scss';
 @import '../../styles/mixin.scss';
 .footer{
-  width: 100%;
-  height: 12vh;
-  background-color: $footerColor;
-  display: flex;
-  text-align: center;
-  position: absolute;
-
-
-}
-.footerBox{
-  flex: 1;
-  padding: 20px;
-
+  background-color: $frameColor;
 }
 
-.semanticInfo{
-  flex: 1.5;
-  display: flex;
-  text-align: center;
-}
-.semanticInfoBox{
-  flex: 1;
-}
-img{
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-p {
+a {
   color: black;
 }
 
-@media screen and (max-width: 1400px) {
-  .footer{
-  width: 100%;
-  height: auto;
-  background-color: $footerColor;
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  position: absolute;
-  }
-  .semanticInfo{
-    flex: 1.5;
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-  }
-  img{
-    max-width: 30%;
-    max-height: 30%;
-    min-width: 10%;
-    min-height: 10%;
+img{
+  max-width: 270px;
+}
 
-  }
-
+@media screen and (max-width: 992px) {
+ .semantic{
+  margin-top: 2vh;
+  margin-bottom: 2vh;
+  margin-left: 20px;
+ }
 }
 
 

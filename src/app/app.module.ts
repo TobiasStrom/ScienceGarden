@@ -1,6 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FooterComponent } from './footer/footer.component';
@@ -16,13 +15,16 @@ import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatCardModule } from '@angular/material/card';
 import { NavbarComponent } from './navbar/navbar.component';
+import { SettingsComponent } from './settings/settings.component';
+import { HashLocationStrategy, LocationStrategy  } from '@angular/common';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     FooterComponent,
-
     HomeComponent,
     InfoComponent,
     SearchFieldComponent,
@@ -30,6 +32,7 @@ import { NavbarComponent } from './navbar/navbar.component';
     SearchListItemComponent,
     TreeGraphComponent,
     NavbarComponent,
+    SettingsComponent,
 
   ],
   imports: [
@@ -39,9 +42,14 @@ import { NavbarComponent } from './navbar/navbar.component';
     FormsModule,
     HttpClientModule,
     BrowserAnimationsModule,
-    MatCardModule
+    MatCardModule,
+    MatCheckboxModule,
+    MatSlideToggleModule,
+
   ],
-  providers: [],
+  providers: [
+    {provide : LocationStrategy , useClass: HashLocationStrategy}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

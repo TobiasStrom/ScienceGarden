@@ -1,35 +1,84 @@
 <div class="all">
-    <div *ngIf="showGraph" class="Info" id="container">
-
+    <div class="Info" id="container">
     </div>
     <div  id="info" class="Info">
-      <button class="btn btn-success" type="button" (click)="onBuildTree()">Bygg tree {{out}}</button>
+      <h1 *ngIf="in == false">Out-citation Graph</h1>
+      <h1 *ngIf="in == true">In-citation Graph</h1>
+      <p class="breaktext">From: {{paperId}} </p>
+      <h3>Total number of articles: <b>{{countTotalUnloadedOnScreen}}</b></h3>
+      <h3>Total number of articles loaded: <b>{{countTotalLoadedOnScreen}}</b></h3>
+      <h3 *ngIf="countTotalLoadedOnScreen != 0">Articles loaded since last build: <b>{{countLoadedSinceLast}}</b></h3>
+      <h3 *ngIf="countTotalLoadedOnScreen == 0">Articles loaded: <b>{{countLoadedSinceLast}}</b></h3>
+      <h3 *ngIf="countTotalLoaded < 20 && !done"><b>Need 20 articles or all to build, please wait...</b></h3>
+      <h3 *ngIf="done"><b>No more articles to fetch</b></h3>
+      <button class="btn button-color" type="button" [disabled]="(stopValue || countTotalLoaded < 20) && !done" (click)="onBuildTree()">Build Graph</button>
+      <button class="btn button-color" type="button" [disabled]="done" (click)="stop()">Stop</button>
 
-      <button class="btn btn-danger" type="button" (click)="stop()">Stop</button>
       <ng-container
         *ngIf="articleClicked; then articleIsClicked; else articleNotClicked">
       </ng-container>
 
       <ng-template #articleIsClicked>
-        <h1>Information:</h1>
+        <div *ngIf="clickedArticle.$title != null">
+        <br>
+        <h2>Article Information</h2>
           <p>Title: {{clickedArticle.$title}}</p>
+          <p *ngIf="clickedArticle.$year != null">Year: <b>{{clickedArticle.$year}}</b></p>
           <p>Authors: {{clickedArticle.$authors}}</p>
-          <p>Abstract: {{clickedArticle.$paperAbstract}}</p>
-          <p>DOI: {{clickedArticle.$DOI}}</p>
-          <p>S2PaperId: {{clickedArticle.$S2PaperID}}</p>
+          <p *ngIf="clickedArticle.$paperAbstract != 'null'">Abstract: {{clickedArticle.$paperAbstract}}</p>
+          <p *ngIf="clickedArticle.$DOI != 'null'">DOI: {{clickedArticle.$DOI}}</p>
+          <p class="breaktext">S2PaperId: {{clickedArticle.$S2PaperID}}</p>
+          <ng-container
+            *ngIf="clickedArticle.$isOpenAccess; then openTrue; else openFalse">
+          </ng-container>
+          <ng-template #openTrue>
+            <p>Open Access: <b>Yes</b> </p>
+          </ng-template>
+          <ng-template #openFalse>
+            <p>Open Access:<b>No</b></p>
+          </ng-template>
+          <ng-container
+            *ngIf="clickedArticle.$isPublisherLicensed; then licensedTrue; else licensedFalse">
+          </ng-container>
+          <ng-template #licensedTrue>
+            <p>Publisher Licensed: <b>Yes</b></p>
+          </ng-template>
+          <ng-template #licensedFalse>
+            <p>Publisher Licensed: <b>No</b></p>
+          </ng-template>
+          <p>In-citations: <b>{{clickedArticle.$inCitations}}</b></p>
+          <p>Out-citations: <b>{{clickedArticle.$outCitations}}</b></p>
+
+          <div class="container">
+            <div class="row">
+              <div class="dot col-auto" style="background-color: {{clickedArticle.$color}} "></div>
+              <p class="col-auto mt-3 ml-0"><b>{{clickedArticleColorDescription}}</b></p>
+            </div>
+          </div>
+          <br>
           <p>Read more about this paper <a href="https://api.semanticscholar.org/{{clickedArticle.$S2PaperID}}" target="_blank">here</a></p>
+          <br>
+        <button *ngIf="articleClicked"  [disabled]="clickedArticle.$title == null || clickedArticle.$inCitations < 1" class="btn button-color" type="button" (click)="onRedraw('in')">Set New Seed In-node</button>
+        <button *ngIf="articleClicked" [disabled]="clickedArticle.$title == null || clickedArticle.$outCitations < 1" class="btn button-color" type="button" (click)="onRedraw('out')">Set New Seed Out-node</button>
+        </div>
+        <div *ngIf="clickedArticle.$title == null">
+          <br>
+          <br>
+          <h2>Article Information</h2>
+          <p>This article has not finished loading, please wait and rebuild...</p>
+          <p class="breaktext">S2PaperId: {{clickedArticle.$S2PaperID}}</p>
+          <div class="container">
+            <div class="row">
+              <div class="dot col-auto " style="background-color: {{clickedArticle.$color}} "></div>
+              <p class="col-auto mt-3 ml-0"><b>{{clickedArticleColorDescription}}</b></p>
+            </div>
+          </div>
+          </div>
       </ng-template>
       <ng-template #articleNotClicked>
-        <h1>Please click on an article</h1>
-      </ng-template>
-
         <br>
-        <button *ngIf="articleClicked" class="btn btn-primary" type="button" (click)="onRedraw('in')">Set as root in-node</button>
-        <button *ngIf="articleClicked" class="btn btn-primary" type="button" (click)="onRedraw('out')">Set as root out-node</button>
+        <br>
+        <h2>Click on a node to display more information</h2>
+      </ng-template>
     </div>
-
 </div>
-<div *ngIf="!showGraph ">
-  <p>New more nodes to build tree</p>
-</div>
-

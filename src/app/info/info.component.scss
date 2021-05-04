@@ -1,6 +1,54 @@
-@import '/src/styles/mixin.scss';
+@import '/src/styles/mixin.scss', '/src/styles/constants.scss';
 .info{
   @include displayFlex(column);
-  height: 97vh;
-  text-align: center;
+  background-color: $bodyColor;
+  min-height: 97vh;
 }
+.infoText{
+  max-width: 1500px;
+  padding: 5%;
+}
+.dot{
+  width: 50px;
+  height: 50px;
+  background-color: red;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+.img-oslo{
+  max-width: 500px;
+}
+.img-living{
+  max-width: 800px;
+}
+
+.colors{
+  display: flex;
+  flex-direction: row;
+}
+.colorInfo{
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+}
+
+@media screen and (max-width: 500px) {
+  .colors{
+    display: flex;
+    flex-direction: column;
+  }
+  .dot{
+    width: 50px;
+    height: 50px;
+    background-color: red;
+    margin-left: 20px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  h3.text{
+    margin-left: 15px;
+  }
+}
+
+
+
