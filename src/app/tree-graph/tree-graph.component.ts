@@ -286,7 +286,7 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
       if(this.screenWidth <= 992){
         //this.graphHeight = this.graphHeight * 0.1;
         ratio = 0.60;
-        this.graphWidth = this.screenWidth * 0.95;
+        this.graphWidth = this.screenWidth * 0.9665;
         height = this.screenHeight * 0.82 - 300;
       }
 

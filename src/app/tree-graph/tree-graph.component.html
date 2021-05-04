@@ -67,11 +67,13 @@
           <h2>Article Information</h2>
           <p>This article has not finished loading, please wait and rebuild...</p>
           <p>S2PaperId: {{clickedArticle.$S2PaperID}}</p>
-          <div>
-            <div class="dot" style="background-color: {{clickedArticle.$color}} "></div>
-            <p>{{clickedArticleColorDescription}}</p>
+          <div class="container">
+            <div class="row">
+              <div class="dot col-auto " style="background-color: {{clickedArticle.$color}} "></div>
+              <p class="col-auto mt-3 ml-0"><b>{{clickedArticleColorDescription}}</b></p>
+            </div>
           </div>
-        </div>
+          </div>
       </ng-template>
       <ng-template #articleNotClicked>
         <br>
