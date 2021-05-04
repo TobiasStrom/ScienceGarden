@@ -1,6 +1,8 @@
 <div class="settings">
 
   <h2>Graph Settings</h2>
+  <br>
+  <br>
   <div class="container test w-75">
     <div class="d-flex justify-content-between row px-5">
       <h3 class="col-md-2 px-4 text-center text my-auto">Max children per node</h3>
@@ -20,10 +22,12 @@
       </div>
     </div>
   </div>
-  <div class="form-check">
-    <input class="form-check-input" type="checkbox" value="" [ngModel]="colorBlind" (change)="onCheckBox($event)" id="flexCheckDefault">
-    <label class="form-check-label" for="flexCheckDefault">
-      Color blind
-    </label>
+  <br>
+  <br>
+  <div class="form-group">
+    <span class="switch switch-sm">
+      <input type="checkbox" [(ngModel)]="colorBlind" class="switch" id="switch-sm" (change)="onCheckBox($event)">
+      <label for="switch-sm">Deuteranomaly (color blindness)</label>
+    </span>
   </div>
 </div>

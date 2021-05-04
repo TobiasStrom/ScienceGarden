@@ -1,5 +1,8 @@
 @import '/src/styles/mixin.scss', '/src/styles/constants.scss';
 .home{
+  //background-image: url("/assets/cubes/cubes_@2X.png");
+  //background-repeat: no-repeat;
+  //background-size: cover;
   @include displayFlex(column);
   height: 97vh;
   text-align: center;

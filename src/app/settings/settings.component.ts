@@ -19,12 +19,12 @@ export class SettingsComponent implements OnInit, OnDestroy {
 
     let maxNodesPerNode = Number(localStorage.getItem('MaxNodesPerNode'));
     let maxTotalNodes = Number(localStorage.getItem('MaxTotalNodes'));
-    let colorBlind = Number(localStorage.getItem('ColorBlind'));
+    let colorBlindNum = Number(localStorage.getItem('ColorBlind'));
 
 
-    if(colorBlind != null && colorBlind !== null){
-      console.log('OnInit ' + colorBlind);
-      if(colorBlind == 1){
+    if(colorBlindNum != null && colorBlindNum !== null){
+      console.log('OnInit ' + colorBlindNum);
+      if(colorBlindNum == 1){
         this.colorBlind = true;
       }else{
         this.colorBlind = false;
@@ -74,6 +74,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   onCheckBox(event : Event){
     this.colorBlind = (event.target as HTMLInputElement).checked;
     this.saveToLocaleStorage();
+    console.log(this.colorBlind);
   }
 
   saveToLocaleStorage(){

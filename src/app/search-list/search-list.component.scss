@@ -1,5 +1,9 @@
 @import '../../styles/mixin.scss', '../../styles/constants.scss';
 
+.searchScreen{
+  background-color: $bodyColor;
+}
+
 .navigate{
   width: 100%;
   display: flex;

@@ -23,8 +23,7 @@ export class SearchService{
     ) {
       this.updateMaxValues();
     }
-  //startUrl : string = "http://dettefunker.no/api/article";
-  startUrl : string = "https://dettefunker.no/api/article";
+    startUrl : string = "https://api.sciencegarden.org/api/article";
 
 
 
@@ -218,7 +217,7 @@ export class SearchService{
 
       catchError(errorRes => {
           // Send to analytics server
-          return throwError('FEil');
+          return throwError('Vi får en feil');
         })
       );
   }

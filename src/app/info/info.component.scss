@@ -1,6 +1,7 @@
 @import '/src/styles/mixin.scss', '/src/styles/constants.scss';
 .info{
   @include displayFlex(column);
+  background-color: $bodyColor;
   min-height: 97vh;
   //text-align: center;
 }
@@ -14,6 +15,12 @@
   background-color: red;
   border-radius: 50%;
   margin-right: 10px;
+}
+.img-oslo{
+  max-width: 500px;
+}
+.img-living{
+  max-width: 800px;
 }
 
 .colors{

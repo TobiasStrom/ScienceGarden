@@ -5,10 +5,10 @@
       <h1 *ngIf="in == false">Out-citation Graph</h1>
       <h1 *ngIf="in == true">In-citation Graph</h1>
       <p>From: {{paperId}} </p>
-      <h3>Total number of articles: {{countTotalUnloadedOnScreen}}</h3>
-      <h3>Total number of articles loaded: {{countTotalLoadedOnScreen}}</h3>
-      <h3 *ngIf="countTotalLoadedOnScreen != 0">Articles loaded since last build: {{countLoadedSinceLast}}</h3>
-      <h3 *ngIf="countTotalLoadedOnScreen == 0">Articles loaded: {{countLoadedSinceLast}}</h3>
+      <h3>Total number of articles: <b>{{countTotalUnloadedOnScreen}}</b></h3>
+      <h3>Total number of articles loaded: <b>{{countTotalLoadedOnScreen}}</b></h3>
+      <h3 *ngIf="countTotalLoadedOnScreen != 0">Articles loaded since last build: <b>{{countLoadedSinceLast}}</b></h3>
+      <h3 *ngIf="countTotalLoadedOnScreen == 0">Articles loaded: <b>{{countLoadedSinceLast}}</b></h3>
       <h3 *ngIf="countTotalLoaded < 20 && !done"><b>Need 20 articles or all to build, please wait...</b></h3>
       <h3 *ngIf="done"><b>No more articles to fetch</b></h3>
       <button class="btn button-color" type="button" [disabled]="(stopValue || countTotalLoaded < 20) && !done" (click)="onBuildTree()">Build Graph</button>
@@ -23,7 +23,7 @@
         <br>
         <h2>Article Information</h2>
           <p>Title: {{clickedArticle.$title}}</p>
-          <p *ngIf="clickedArticle.$year != null">Year: {{clickedArticle.$year}} </p>
+          <p *ngIf="clickedArticle.$year != null">Year: <b>{{clickedArticle.$year}}</b></p>
           <p>Authors: {{clickedArticle.$authors}}</p>
           <p *ngIf="clickedArticle.$paperAbstract != 'null'">Abstract: {{clickedArticle.$paperAbstract}}</p>
           <p *ngIf="clickedArticle.$DOI != 'null'">DOI: {{clickedArticle.$DOI}}</p>
@@ -32,22 +32,22 @@
             *ngIf="clickedArticle.$isOpenAccess; then openTrue; else openFalse">
           </ng-container>
           <ng-template #openTrue>
-            <p>Open Access: Yes</p>
+            <p>Open Access: <b>Yes</b> </p>
           </ng-template>
           <ng-template #openFalse>
-            <p>Open Access: No</p>
+            <p>Open Access:<b>No</b></p>
           </ng-template>
           <ng-container
             *ngIf="clickedArticle.$isPublisherLicensed; then licensedTrue; else licensedFalse">
           </ng-container>
           <ng-template #licensedTrue>
-            <p>Publisher Licensed: Yes</p>
+            <p>Publisher Licensed: <b>Yes</b></p>
           </ng-template>
           <ng-template #licensedFalse>
-            <p>Publisher Licensed: No</p>
+            <p>Publisher Licensed: <b>No</b></p>
           </ng-template>
-          <p>In-citations: {{clickedArticle.$inCitations}}</p>
-          <p>Out-citations: {{clickedArticle.$outCitations}}</p>
+          <p>In-citations: <b>{{clickedArticle.$inCitations}}</b></p>
+          <p>Out-citations: <b>{{clickedArticle.$outCitations}}</b></p>
 
           <div class="container">
             <div class="row">

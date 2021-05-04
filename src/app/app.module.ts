@@ -18,6 +18,7 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { SettingsComponent } from './settings/settings.component';
 import { HashLocationStrategy, LocationStrategy  } from '@angular/common';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 
 
 @NgModule({
@@ -42,7 +43,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     HttpClientModule,
     BrowserAnimationsModule,
     MatCardModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatSlideToggleModule,
 
   ],
   providers: [

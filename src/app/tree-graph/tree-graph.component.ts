@@ -61,18 +61,16 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
   //selectedArticle : Article = this.searchService.selectedArticle;
 
   @HostListener('window:resize', ['$event'])
-    getScreenSize(event?) {
-          this.screenHeight = window.innerHeight;
-          this.screenWidth = window.innerWidth;
+  getScreenSize(event?) {
+        this.screenHeight = window.innerHeight;
+        this.screenWidth = window.innerWidth;
 
-    }
+  }
 
   onBuildTree() {
     this.countTotalLoadedOnScreen = this.countTotalLoaded;
     this.countTotalUnloadedOnScreen = this.countTotalUnloaded;
-    console.log(this.searchService.root);
-    console.log('Total loaded' + this.countTotalLoaded);
-    console.log()
+
     this.countTotalUnloaded = this.searchService.countTotal;
     var obj = d3.hierarchy(this.searchService.root);
     var count = obj.count();
@@ -82,16 +80,16 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
       var count = obj.count();
 
       this.widthScreen = count.value * 275;
-      /*
+
       if(this.widthScreen < 12000){
         this.widthScreen = 12000;
       }
-      */
+
       let draw = (source) => {
         let margin = { top: 20, right: 500, bottom: 20, left: 20 };
         let width = this.widthScreen- margin.left - margin.right + 400;
         let height = 500 - margin.top - margin.bottom;
-        let treemap = d3.tree<Article>().nodeSize([width/count.value, height/1000]);
+        let treemap = d3.tree<Article>().nodeSize([width/count.value, 0.5]); //height/1000
         root = root.sort((a,b) => {return +a.$year - b.$year});
         let treeData = treemap(root);//.sort((a,b) => { return +a.$year- +b.$year});
         let nodes = treeData.descendants();
@@ -158,6 +156,7 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
             (d) => 'translate(' + source.x0 + ',' + source.y0 + ')'
           )
           .on('click', (d) => {
+            console.log(d)
             this.clickedArticle = d.data;
             draw(this.clickedArticle);
             this.articleClicked = true;
@@ -280,9 +279,19 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
         return path;
       };
 
+      let ratio = 0.82;
+      let height = this.screenHeight * 0.82 - 500;
+      this.graphWidth = this.screenWidth * 0.693
+
+      if(this.screenWidth <= 992){
+        //this.graphHeight = this.graphHeight * 0.1;
+        ratio = 0.60;
+        this.graphWidth = this.screenWidth * 0.95;
+        height = this.screenHeight * 0.82 - 300;
+      }
+
       let margin = { top: 30, right: 200, bottom: 500, left: 200 };
-      let width = this.screenWidth -margin.left - margin.right;  //2500 - margin.left - margin.right + 400;
-      let height = this.screenHeight - margin.top - margin.bottom;
+      let width = this.graphWidth;// -margin.left - margin.right;  //2500 - margin.left - margin.right + 400;
 
       //The following three variables determine the initial postion and scale of the graph
       let translateX = width/2;
@@ -291,17 +300,8 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
 
       let transform = d3.zoomIdentity.translate(translateX, translateY).scale(scale);
 
-      this.graphWidth = this.screenWidth;
+      //this.graphWidth = this.screenWidth;
 
-      if(this.screenWidth > 992){
-        this.graphWidth = this.graphWidth * 0.693
-      }
-      else{
-        this.graphWidth = this.graphWidth * 0.95
-
-
-      //this.firstLoad = false;
-      }
       let zoom = d3.zoom().on('zoom', function () {
         svg.attr('transform', d3.event.transform);
       })
@@ -309,7 +309,7 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
         .select('#container')
         .append('svg')
         .attr('width', this.graphWidth)
-        .attr('height', this.screenHeight * 0.82)
+        .attr('height', this.screenHeight * ratio)
         .call(d3.zoom().transform, transform)
         .call(zoom)
         .append('g')
@@ -322,11 +322,10 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
       let root;
       root = this.searchService.root;
       root = d3.hierarchy(root);
-      root.x0 = this.graphWidth/ 2;
-      root.y0 = 0;
+      root.x0 = 0; //this.graphWidth/ 2;
+      root.y0 =  0;//this.screenHeight/2; // 0 HEKJSDLKJDSLKFJLASKF
 
       draw(root);
-
     }
   }
 
@@ -343,14 +342,11 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
 
   }
 
-
-
   ngOnDestroy() {
     this.resetVariables();
     this.stop();
   }
   pressed: boolean = false;
-
 
   onFetchArticle() {
     var type;
