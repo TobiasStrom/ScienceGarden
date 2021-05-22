@@ -36,7 +36,7 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
   countTotalLoaded : number = 0;
   countTotalUnloaded : number = 0;
   countTotalLoadedOnScreen: number = 0;
-  countTotalUnloadedOnScreen: number = 0;
+  countTotalOnScreen: number = 0;
 
   countLoadedSinceLast: number = 0;
   done: boolean = false;
@@ -69,17 +69,19 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
 
   /**
    * Builds the tree from data set in search service
-   * Uses d3 magic with some variables for sizing and customisation
+   * This method was copied and heavily modified to suit our needs.
+   * Copied from  https://github.com/ImryLevySadan/d3.js-with-angualr-7?fbclid=IwAR2J7uOY-FpgqbH0bwhkHYj_uj55gkOnNau3eP-VIaAIbBmA18GoePz5jzs
    */
   onBuildTree() {
-    this.countTotalLoadedOnScreen = this.countTotalLoaded;
-    this.countTotalUnloadedOnScreen = this.countTotalUnloaded;
+    this.countTotalLoadedOnScreen = this.countTotalLoaded; //Total number of loaded nodes on screen
+    this.countTotalOnScreen = this.searchService.totalCountTree; // Total number of nodes on screen
+    //this.countTotalUnloaded = this.searchService.countTotal; //Total number of nodes not yet loaded
 
-    this.countTotalUnloaded = this.searchService.countTotal;
+
     var obj = d3.hierarchy(this.searchService.root);
     var count = obj.count();
     if (this.pressed && count.value > 0) {
-      d3.select("svg").remove();
+      d3.select("svg").remove(); // remove previous built graph
       var obj = d3.hierarchy(this.searchService.root);
       var count = obj.count();
 
@@ -90,9 +92,7 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
       }
 
       let draw = (source) => {
-        let margin = { top: 20, right: 500, bottom: 20, left: 20 };
-        let width = this.widthScreen - margin.left - margin.right + 400;
-        let height = 500 - margin.top - margin.bottom;
+        let width = this.widthScreen //- margin.left - margin.right + 400;
         let treemap = d3.tree<Article>().nodeSize([width/count.value, 0.5]);
         root = root.sort((a,b) => {return +a.$year - b.$year});
         let treeData = treemap(root);
@@ -105,7 +105,7 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
         else{
           max = 5000;
         }
-        // To sett different length of edjes
+        // To set different y positions on nodes in different layers.
         nodes.forEach((d) => {
           if(this.in){
             if(this.widthScreen * 0.4 > 5000){
@@ -148,7 +148,7 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
         let node = g
           .selectAll('g.node')
           .data(nodes, (d) => d['id'] || (d['id'] = ++this.i));
-
+        // When node enter the screen
         let nodeEnter = node
           .enter()
           .append('g')
@@ -199,22 +199,6 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
           )
           .attr('cursor', 'pointer');
 
-        let nodeExit = node
-          .exit()
-          .transition()
-          .duration(this.duration)
-          .attr(
-            'transform',
-            (d) => 'translate(' + source.x + ',' + source.y + ')'
-          )
-          .remove();
-
-        // On exit reduce the node circles size to 0
-        nodeExit.select('circle').attr('r', 1e-6);
-
-        // On exit reduce the opacity of text labels
-        nodeExit.select('text').style('fill-opacity', 1e-6);
-
         // Let's draw links
         let link = g.selectAll('path.link').data(links, (d) => d['id']);
 
@@ -239,22 +223,6 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
           .duration(this.duration)
           .attr('d', (d) => diagonal(d, d.parent));
 
-        // Remove any exiting links
-        let linkExit = link
-          .exit()
-          .transition()
-          .duration(this.duration)
-          .attr('d', (d) => {
-            let o = { x: source.x, y: source.y };
-            return diagonal(o, o);
-          })
-          .remove();
-
-        // Store the old positions for transition.
-        nodes.forEach(function (d) {
-          d['x0'] = d.x;
-          d['y0'] = d.y;
-        });
       };
 
       //Curved lines
@@ -334,10 +302,6 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
     window.scroll(0,0);
     this.getScreenSize();
     this.onFetchArticle();
-    this.route.queryParams.subscribe( params => {
-      var type = params['state'];
-      this.paperId = params['paperId'];
-    });
   }
 
   /**
@@ -353,7 +317,6 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
    */
   onFetchArticle() {
     var type;
-
     this.route.queryParams.subscribe( params => {
       type = params['state'];
       this.paperId = params['paperId'];
@@ -418,7 +381,7 @@ export class TreeGraphComponent implements OnInit, OnDestroy {
    */
   updateColorDescription(){
     let type = this.clickedArticle.$type;
-    if(type == "normal"){
+    if(!this.clickedArticle.$isOpenAccess){
       this.clickedArticleColorDescription = "This article is not open access";
     }
     if(this.clickedArticle.$isOpenAccess){

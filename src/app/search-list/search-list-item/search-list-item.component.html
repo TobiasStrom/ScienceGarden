@@ -3,6 +3,8 @@
     <h2>{{article.$title}}</h2>
     <p *ngIf="article.$year!=null">Year: {{article.$year}} </p>
     <p>PaperID: {{article.$S2PaperID}}</p>
+    <p *ngIf="article.$authors.length == 1 && moreInfo">Author: {{article.$authors}}</p>
+    <p *ngIf="article.$authors.length!= 0 && moreInfo && article.$authors.length != 1">Authors: {{article.$authors}}</p>
     <p *ngIf="article.$paperAbstract!=null && moreInfo;">PaperAbstract: {{article.$paperAbstract}} </p>
     <p *ngIf="article.$DOI!='' || article.$DOI != null">DOI: {{article.$DOI}} </p>
     <p *ngIf="moreInfo">In-citations: {{article.$inCitations}} </p>

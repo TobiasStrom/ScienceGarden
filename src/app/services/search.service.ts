@@ -26,66 +26,66 @@ export class SearchService{
   totalCountTree: number = 1;
   nodes : string[] = [];
 
-  constructor( private http: HttpClient) { this.updateMaxValues()}
-    startUrl : string = "https://api.sciencegarden.org/api/article";
+  constructor( private http: HttpClient) {this.updateMaxValues()}
+    startUri : string = "https://api.sciencegarden.org/api/article";
 
-    /**
-     * Returns a list of articles based on a search query by title
-     */
-   fetchPosts(title : string, method : string, page : number) {
-    var url : string = "";
-    let searchParams = new HttpParams();
-    searchParams = searchParams.append('state', 'root');
-    searchParams = searchParams.append('bySearchEngine', 'no');
-    url = this.startUrl+"/title/"+title;
-    searchParams = searchParams.append('pageID', page.toString());
 
-    return this.http
-      .get<{ [key: string]: Article }>(
-        url,
-        {
-          params: searchParams,
-          responseType: 'json'
+  /**
+   * Returns a array of articles based on a search query by title
+   */
+  fetchArticles(title : string, page : number) {
+  let searchParams = new HttpParams();
+  searchParams = searchParams.append('bySearchEngine', 'no');   // Appends search params
+  searchParams = searchParams.append('pageID', page.toString()); //PageID
+  var uri = this.startUri+"/title/"+title;                      //Appends /title/ to URI
+
+  return this.http //Request
+    .get<{ [key: string]: Article }>(
+      uri,
+      {
+        params: searchParams,
+        responseType: 'json'
+      }
+    )
+    .pipe(
+      map(responseData => { //Pipe response and map
+        if(responseData['error']){ // Check if there are no results, or other error
+          return [new Article('-1')]; // return new Article with S2PaperId equal to "-1" as indicator;
         }
-      )
-      .pipe(
-        map(responseData => {
-          if(responseData['error']){
-            return [new Article('-1')];
-           }
-          const searchArray: Article[] = [];
-          for (var id in responseData) {
-            if (responseData.hasOwnProperty('papers')) {
-              for(var element in responseData[id]){
-                var doi = "";
-                if(responseData[id][element]['DOI'] != ''){
-                    doi = responseData[id][element]['DOI'];
-                }else{
-                  doi = "This paper has no DOI"
-                }
-                let article = new Article(responseData[id][element]['S2PaperID'], null , [], [], doi, false, false,  responseData[id][element]['Title'], null);
-                searchArray.push(article);
+        const searchArray: Article[] = []; //Array for results
+        for (var id in responseData) { // Loops through results
+          if (responseData.hasOwnProperty('papers')) { // Check if response has papers
+            for(var element in responseData[id]){
+              var doi = "";
+              if(responseData[id][element]['Doi'] != ''){ // Check if response has DOI
+                  doi = responseData[id][element]['Doi']; // Add DOI
+              }else{
+                doi = "This paper has no DOI" // No DOI
               }
+              //New Article with response data
+              let article = new Article(responseData[id][element]['S2PaperID'], null , [], [], doi, false, false,
+                responseData[id][element]['Title'], null);
+              searchArray.push(article); //Add Article object to array
             }
           }
-          return searchArray;
-        }),
-        catchError(errorRes => {
-          // Send to analytics server
-          return throwError(errorRes);
-        })
-      );
+        }
+        return searchArray; //Return results as array
+      }),
+      catchError(errorRes => {
+        return throwError(errorRes);
+      })
+    );
   }
 
   /**
-   * Gets a node from API with information based on a search query by S2PaperID or DOI.
+   * Gets a node from API with information based on a search query by S2PaperID or DOI. Similar to fetchPosts
    */
-  fetchNodes(input: string, method: string, state: string) {
-    var url : string = this.startUrl+"/S2PaperID/"+input;
+  fetchArticle(input: string, method: string, state: string) {
+    var url : string = this.startUri+"/S2PaperID/"+input;
     let searchParams = new HttpParams().append('state', 'root');
 
     if(method == "doi"){
-      url = this.startUrl+"/DOI/"+input;
+      url = this.startUri+"/DOI/"+input;
     }
 
     return this.http
@@ -103,8 +103,23 @@ export class SearchService{
             return new Article('-1');
            }
 
-          var paperAbstract : string = String(responseData["PaperAbstract"]);
-          var authors : string[] = [];
+           return this.convertResponseToArticle(responseData, state); // Convert response to Article object
+
+        }
+      ),
+
+      catchError(errorRes => {
+          return throwError(errorRes);
+        })
+      );
+  }
+
+  /**
+   *  Takes the response as responseData with state, and convert the response to an Article object
+   */
+  convertResponseToArticle(responseData : { [key: string]: Article }, state: string){
+    var paperAbstract : string = String(responseData["PaperAbstract"]);
+          var authors : string[] = []; // Keeps track of Authors
           for(let id in responseData["Authors"]){
               authors.push(responseData["Authors"][id]);
           }
@@ -112,38 +127,35 @@ export class SearchService{
           var inCount: number = 0;
           var outCount : number = 0;
 
-          // If the tree is in-tree it fills the node with all the In-citations
+          // If the graph is an in-citation graph, add in-citations to children array of type Article
           if(state == 'in'){
 
             for(let i = 0; i < Object.keys(responseData["InCitations"]).length; i++){
               if(this.totalCountTree < this.maxTotalNodes){
-                if(i < this.maxNodesPerNode){// Only add to list if [i] is les than [maxNodesPerNode]
+                if(i < this.maxNodesPerNode){// Only add to list if [i] is less than [maxNodesPerNode]
                   var inArticle = new Article(responseData['InCitations'][i], null, null, null,null,null , null, null, null, "#dae0e6", null);
                   children.push(inArticle);
                   this.totalCountTree++;
                 }
-                inCount++; // Keeps track of InCitation count to display later
+                inCount++; // Keeps track of in-citation count to display later
               }
             }
-            for(let id in responseData["OutCitations"]){
-              outCount++; // Keeps track of outCitation count to display later
-            }
+            outCount = Object.keys(responseData["OutCitations"]).length; // Keeps track of out-citation count to display later
 
-          }else{ // If the tree is out-tree it fills the node with all the out-citations
+
+          }else{ // If the graph is an out-citation graph, add out-citations to children array of type Article
             for (let i = 0; i < Object.keys(responseData["OutCitations"]).length; i++) {
               if(this.totalCountTree < this.maxTotalNodes){
-                if(i < this.maxNodesPerNode){ // only add to list if [i] is les than [maxNodesPerNode]
+                if(i < this.maxNodesPerNode){ // only add to list if [i] is less than [maxNodesPerNode]
                   var outArticle = new Article(responseData['OutCitations'][i], null, null, null,null,null , null, null, null, "#dae0e6", null);
                   children.push(outArticle);
                   this.totalCountTree++;
                 }
-                outCount++; // Keeps track of outCitation count to display later
+                outCount++; // Keeps track of out-citation count to display later
               }
 
             }
-            for(let id in responseData['InCitations']){
-              inCount++;  // Keeps track of InCitation count to display later
-            }
+            inCount = Object.keys(responseData["InCitations"]).length; // Keeps track of in-citation count to display later
 
           }
 
@@ -156,25 +168,25 @@ export class SearchService{
             else{
               doi = "This paper has no DOI"
             }
-
           }
-
+          //IsOpenAccess
           var isOpenAccess : boolean = false;
           if(String(responseData['IsOpenAccess']) === "true"){
             isOpenAccess = true;
           }
 
+          // Publisher Licensed
           var isPublisherLicensed : boolean = false;
           if(String(responseData['IsPublisherLicensed']) === "true"){
             isPublisherLicensed = true;
           }
 
-          var paperID = String(responseData['S2PaperID']);
-          var title = String(responseData['Title']);
-          var year = responseData["Year"];
-          var type = "normal";
+          var paperID = String(responseData['S2PaperID']); // PaperID
+          var title = String(responseData['Title']); //Title
+          var year = responseData["Year"]; // Tear
+          var type = "none"; //Type, none -> no/false for all metrics
 
-          // Checks if the title contains some of the keywords indicating it has been retracted
+          // Checks if the title contains some of the keywords indicating that it has been retracted
           if(
             title.toUpperCase().includes("RETRACTED:") ||
             title.toUpperCase().includes("RETRACTED :") ||
@@ -203,14 +215,6 @@ export class SearchService{
             isPublisherLicensed, title, Number(year), null,  type, inCount, outCount);
 
           return article;
-        }
-      ),
-
-      catchError(errorRes => {
-          // Send to analytics server
-          return throwError('Vi får en feil');
-        })
-      );
   }
 
   /**
@@ -229,7 +233,7 @@ export class SearchService{
     this.current = null;
     this.stopped = false;
 
-    const sub = this.fetchNodes(rootId, 'S2PaperId', type).pipe(first()).subscribe(node => {
+    const sub = this.fetchArticle(rootId, 'S2PaperId', type).pipe(first()).subscribe(node => {
       this.root = node;
       if(this.root.$type != 'retracted'){
         this.root.$type = 'root';
@@ -237,7 +241,7 @@ export class SearchService{
       this.value = true;
       this.countTotal++;
     });
-    // Wait for responce
+    // Wait for response
     while(!this.value){
       await this.delay(10);
     }
@@ -278,6 +282,7 @@ export class SearchService{
       let currentNode : Article = BFSQueue.shift();
       this.queue.push(currentNode);
       if(this.nodes.includes(currentNode.$S2PaperID)){ // if it includes s2paperId then it exists in Semantic database and has data
+        this.totalCountTree -= currentNode.$children.length;
         currentNode.$children = [];
         currentNode.$type = "exist";
       }else{
@@ -285,12 +290,12 @@ export class SearchService{
       }
 
       currentNode = this.setColor(currentNode, type);
-      for(let i=0; i < currentNode.$children.length; i++){ // Adds all children with data into the database
+      for(let i=0; i < currentNode.$children.length; i++){ // Adds all children, with data, to the queue
         if (this.stopped){
           break;
         }
         this.value = false;
-        const sub = this.fetchNodes(currentNode.$children[i].$S2PaperID, 'S2PaperId', type).pipe(first()).subscribe(post => { // get information from api
+        const sub = this.fetchArticle(currentNode.$children[i].$S2PaperID, 'S2PaperId', type).pipe(first()).subscribe(post => { // get information from api
 
           if(!this.stopped){
             if (this.countTotal >= this.maxTotalNodes){ // Checks if limits have been reached
@@ -304,10 +309,10 @@ export class SearchService{
               BFSQueue.push(post);
               this.value = true;
               this.countTotal++;
+              console.log(this.countTotal);
             }
           }
         });
-
         while(!this.value && !this.stopped){ // wait for response
           await this.delay(10);
         }
@@ -324,26 +329,26 @@ export class SearchService{
     this.done = true;
   }
 
-  /**
+  /*
    * A method that determines what color a node should be displayed as
    */
   setColor(node: Article, type : String){
     if(Number(localStorage.getItem('ColorBlind')) == 0){ // Checks if colorblind mode has been enabled. If 0, then not enabled.
 
-      if(node.$type == "normal"){
+      if(node.$type == "none"){ // no/false for all quality metrics
         node.$color = "#7d942a";
       }
-      if(node.$isOpenAccess == true){
+      if(node.$isOpenAccess == true){ // is open access
         node.$color = "#51d63d";
       }
-      if(node.$type == 'exist'){
-        node.$color = "blue";
+      if(node.$type == 'exist'){ // duplicate(s) within the graph
+        node.$color = "#0000FF";
         return node;
       }
-      if(node.$type == 'root') {
+      if(node.$type == 'root') { // seed node
         node.$color = "#8B4513";
       }
-      if(node.$type == "retracted"){
+      if(node.$type == "retracted"){ // retracted article
         node.$color = "#FF0000";
         return node;
       }
@@ -352,7 +357,7 @@ export class SearchService{
         node.$color = "#000099";
         return node;
       }
-      if(node.$type == "normal"){
+      if(node.$type == "none"){
         node.$color = "#FFD89D";
       }
       if(node.$isOpenAccess == true){
@@ -380,8 +385,8 @@ export class SearchService{
       this.maxTotalNodes = maxTotalNodes;
       this.maxNodesPerNode = maxNodesPerNode;
     } else{
-      this.maxTotalNodes = 10000;
-      this.maxNodesPerNode = 10000;
+      this.maxTotalNodes = 10000; // Default value
+      this.maxNodesPerNode = 10000; // ----||----
     }
   }
 }

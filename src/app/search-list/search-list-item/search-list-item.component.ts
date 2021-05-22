@@ -23,7 +23,7 @@ export class SearchListItemComponent{
       the corresponding button will be deactivated
   */
   onNavigate(paperId:string, state : string){
-    this.searchService.fetchNodes(paperId, 'id', state).subscribe(
+    this.searchService.fetchArticle(paperId, 'id', state).subscribe(
       post => {
         if(post.$S2PaperID != '-1'){
           this.article = post;
@@ -62,7 +62,7 @@ export class SearchListItemComponent{
       it return more information and make the card bigger
    */
   onMoreInfo(paperId: string, state : string){
-    this.searchService.fetchNodes(paperId, 'id', 'root').subscribe(
+    this.searchService.fetchArticle(paperId, 'id', 'root').subscribe(
       post => {
         if(post.$S2PaperID != '-1'){
           if(post.$outCitations == 0){

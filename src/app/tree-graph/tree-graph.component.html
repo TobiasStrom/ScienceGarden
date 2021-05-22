@@ -5,7 +5,7 @@
       <h1 *ngIf="in == false">Out-citation Graph</h1>
       <h1 *ngIf="in == true">In-citation Graph</h1>
       <p class="breaktext">From: {{paperId}} </p>
-      <h3>Total number of articles: <b>{{countTotalUnloadedOnScreen}}</b></h3>
+      <h3>Total number of articles: <b>{{countTotalOnScreen}}</b></h3>
       <h3>Total number of articles loaded: <b>{{countTotalLoadedOnScreen}}</b></h3>
       <h3 *ngIf="countTotalLoadedOnScreen != 0">Articles loaded since last build: <b>{{countLoadedSinceLast}}</b></h3>
       <h3 *ngIf="countTotalLoadedOnScreen == 0">Articles loaded: <b>{{countLoadedSinceLast}}</b></h3>
@@ -22,12 +22,13 @@
         <div *ngIf="clickedArticle.$title != null">
         <br>
         <h2>Article Information</h2>
-          <p>Title: {{clickedArticle.$title}}</p>
+          <p>Title: <b>{{clickedArticle.$title}}</b></p>
           <p *ngIf="clickedArticle.$year != null">Year: <b>{{clickedArticle.$year}}</b></p>
-          <p>Authors: {{clickedArticle.$authors}}</p>
-          <p *ngIf="clickedArticle.$paperAbstract != 'null'">Abstract: {{clickedArticle.$paperAbstract}}</p>
-          <p *ngIf="clickedArticle.$DOI != 'null'">DOI: {{clickedArticle.$DOI}}</p>
-          <p class="breaktext">S2PaperId: {{clickedArticle.$S2PaperID}}</p>
+          <p *ngIf="clickedArticle.$authors.length == 1">Author: <b>{{clickedArticle.$authors}}</b></p>
+          <p *ngIf="clickedArticle.$authors.length > 1">Authors: <b>{{clickedArticle.$authors}}</b></p>
+          <p *ngIf="clickedArticle.$paperAbstract != 'null'">Abstract: <b>{{clickedArticle.$paperAbstract}}</b></p>
+          <p *ngIf="clickedArticle.$DOI != 'null'">DOI: <b>{{clickedArticle.$DOI}}</b></p>
+          <p class="breaktext">S2PaperId: <b>{{clickedArticle.$S2PaperID}}</b></p>
           <ng-container
             *ngIf="clickedArticle.$isOpenAccess; then openTrue; else openFalse">
           </ng-container>

@@ -35,7 +35,7 @@ export class SearchListComponent implements OnInit {
     var encoded : string;
     encoded = btoa(name);
     if(this.type == "title"){
-      this.searchService.fetchPosts(encoded, this.type , this.page).pipe(first()).subscribe(
+      this.searchService.fetchArticles(encoded, this.page).pipe(first()).subscribe(
         post => {
           this.list = post;
         }
@@ -45,7 +45,7 @@ export class SearchListComponent implements OnInit {
       if(this.type == "id"){
         encoded = name;
       }
-      this.searchService.fetchNodes(encoded, this.type, "root").pipe(first()).subscribe(
+      this.searchService.fetchArticle(encoded, this.type, "root").pipe(first()).subscribe(
         post => {
           this.list = [];
           this.list.push(post);
